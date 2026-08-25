@@ -114,15 +114,28 @@ a { color: inherit; text-decoration: none; }
 .brand .mk svg { width: 34px; height: 34px; filter: drop-shadow(0 0 8px rgba(51, 226, 198, 0.5)); }
 .brand .nm { font-family: var(--font-hud); font-weight: 700; font-size: 19px; letter-spacing: 0.34em; padding-left: 0.2em; }
 .sep { width: 1px; height: 26px; background: var(--line); }
-/* Status display of the current project. Not interactive yet (multi-project
-   switching is on the roadmap), so it does not use a pointer cursor or a
-   hover state that would imply it is clickable. Bug 2 fix. */
+/* The current project. With one project configured this is a plain status
+   display, so it keeps no pointer cursor and no hover state that would imply
+   it is clickable. Bug 2 fix. With several configured it holds a real select,
+   which earns the pointer cursor because it genuinely does something. */
 .proj {
   display: flex; align-items: center; gap: 9px; padding: 7px 13px;
   border: 1px solid var(--line); background: var(--panel); border-radius: 3px;
   font-family: var(--font-mono); font-size: 12.5px; color: var(--soft);
 }
 .proj .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.proj select {
+  appearance: none; border: 0; background: transparent; color: var(--soft);
+  font-family: inherit; font-size: inherit; cursor: pointer; padding: 0 14px 0 0;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+                    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-size: 5px 5px, 5px 5px;
+  background-position: right 4px center, right 0 center;
+  background-repeat: no-repeat;
+}
+.proj select:hover { color: var(--ink); }
+.proj select:focus-visible { outline: 1px solid var(--accent); outline-offset: 3px; }
+.proj option { background: var(--panel); color: var(--soft); }
 .status-r { margin-left: auto; display: flex; align-items: center; gap: 22px; }
 .nominal { display: flex; align-items: center; gap: 9px; }
 .nominal .d { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); animation: blip 2.4s infinite; }

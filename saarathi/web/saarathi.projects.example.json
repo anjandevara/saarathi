@@ -1,0 +1,14 @@
+[
+  {
+    "id": "playwright-framework",
+    "name": "Playwright Framework",
+    "path": "/absolute/path/to/playwright-ai-framework",
+    "env": "local"
+  },
+  {
+    "id": "shop",
+    "name": "Shop",
+    "path": "/absolute/path/to/another-project",
+    "env": "staging"
+  }
+]

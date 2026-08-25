@@ -64,7 +64,19 @@ App:
     npm install
     SAARATHI_PROJECT_PATH="<absolute path to this repo>" npm run dev   # http://localhost:3000
     npm run build
-    npm run test:integration          # scanner + SQLite tests
+    npm run test:integration          # config + scanner + SQLite tests
+
+To watch more than one project, copy the example file and edit it:
+
+    cd saarathi/web
+    cp saarathi.projects.example.json saarathi.projects.json
+    npm run dev
+
+Each entry needs a `path`. The `id`, `name`, and `env` are optional and
+default from the folder name. The file is gitignored because it holds
+absolute paths for one machine. If it is missing or malformed, Saarathi logs
+the reason and falls back to the single `SAARATHI_PROJECT_PATH` project, so
+the one-project case stays one line.
 
 Framework, testing Saarathi on itself:
 

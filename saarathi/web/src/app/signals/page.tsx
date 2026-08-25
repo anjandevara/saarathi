@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getOverview, getHistory, isDbLive } from "@/lib/data";
+import { getCurrentProjectId, getOverview, getHistory, isDbLive } from "@/lib/data";
 import type { SignalKind } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Signals" };
@@ -13,8 +13,9 @@ const GROUPS: { kind: SignalKind; label: string; color: string }[] = [
 ];
 
 export default async function SignalsPage() {
-  const o = await getOverview();
-  const history = getHistory();
+  const id = await getCurrentProjectId();
+  const o = await getOverview(id);
+  const history = getHistory(id);
 
   return (
     <main className="page-wrap">

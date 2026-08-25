@@ -1,12 +1,15 @@
 import Link from "next/link";
 import Clock from "./Clock";
 import NavLinks from "./NavLinks";
-import { getProjectConfig } from "@/lib/config";
+import ProjectSwitcher from "./ProjectSwitcher";
+import { getProjectConfig, getProjectConfigs } from "@/lib/config";
+import { getCurrentProjectId, PROJECT_COOKIE } from "@/lib/data";
 
 // The persistent HUD frame and top bar, on every screen.
-export default function Chrome() {
-  const project = getProjectConfig();
-  const projectSlug = project.name.toLowerCase().replace(/\s+/g, "-");
+export default async function Chrome() {
+  const projects = getProjectConfigs();
+  const currentId = await getCurrentProjectId();
+  const project = getProjectConfig(currentId);
   return (
     <>
       <div className="frame" aria-hidden="true">
@@ -27,10 +30,7 @@ export default function Chrome() {
         </Link>
         <span className="sep" />
         <NavLinks />
-        <span className="proj" title={project.path || "running on bundled snapshot"}>
-          <span className="dot" />
-          <span>{projectSlug}</span>
-        </span>
+        <ProjectSwitcher projects={projects} currentId={currentId} cookieName={PROJECT_COOKIE} />
         <div className="status-r">
           <span className="nominal">
             <span className="d" />
