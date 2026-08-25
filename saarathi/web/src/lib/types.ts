@@ -65,6 +65,39 @@ export interface SpecFile {
   note: string | null;   // why it could not be read, shown on screen
 }
 
+// Where a data file is used. `test` is null when the reference sits in the
+// file's setup, which every test in that spec shares.
+export interface DataUse {
+  spec: string;
+  test: string | null;
+}
+
+export interface DataFile {
+  path: string;        // relative to the project root, e.g. "fixtures/users.json"
+  ref: string;         // how a spec names it, e.g. "users.json"
+  bytes: number;
+  usedBy: DataUse[];   // empty means no spec names it by a literal path
+}
+
+export interface DataFolder {
+  path: string;              // a folder that really exists, e.g. "fixtures"
+  files: DataFile[];
+  emptySubfolders: string[]; // exist but hold no data file, reported not hidden
+}
+
+// A Playwright fixture is code, not data. In this framework that is the module
+// a spec imports its `test` from.
+export interface FixtureModule {
+  from: string;
+  specs: string[];
+}
+
+export interface DataAndFixtures {
+  folders: DataFolder[];
+  fixtureModules: FixtureModule[];
+  missing: string[];   // named by a spec but not found on disk
+}
+
 export interface Overview {
   project: ProjectMeta;
   run: RunStats | null;
