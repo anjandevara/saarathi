@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Clock from "./Clock";
 import NavLinks from "./NavLinks";
+import Rail from "./Rail";
 import ProjectSwitcher from "./ProjectSwitcher";
 import { getProjectConfig, getProjectConfigs } from "@/lib/config";
 import { getCurrentProjectId, PROJECT_COOKIE } from "@/lib/data";
@@ -41,6 +42,7 @@ export default async function Chrome() {
           </span>
         </div>
       </header>
+      <Rail />
     </>
   );
 }
