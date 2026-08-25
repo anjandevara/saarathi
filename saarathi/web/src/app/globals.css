@@ -277,7 +277,15 @@ a { color: inherit; text-decoration: none; }
 .count .v.teal { color: var(--accent); }
 .count .l { margin-top: 5px; font-family: var(--font-hud); text-transform: uppercase; letter-spacing: 0.14em; font-size: 9px; color: var(--muted); }
 
-#gl { position: fixed; inset: 0; z-index: var(--z-bg); display: block; width: 100vw; height: 100vh; }
+/* The core canvas is decoration: aria-hidden, and it listens for nothing but a
+   window resize. It must not take pointer events. Without this it covers the
+   whole viewport and, wherever the chrome is not itself positioned (below the
+   narrow breakpoint, where the top bar and rail go static), it swallows every
+   click on them. Found by the on-self suite. */
+#gl {
+  position: fixed; inset: 0; z-index: var(--z-bg); display: block;
+  width: 100vw; height: 100vh; pointer-events: none;
+}
 
 /* Static fallback shown when WebGL is unavailable, so the home hero is never
    just a blank black area. Bug 6 fix. */
