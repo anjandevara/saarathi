@@ -293,3 +293,55 @@ a { color: inherit; text-decoration: none; }
   #gl { opacity: 0.32; }
   .ticker .stream { animation: none; padding-left: 0; overflow: hidden; text-overflow: ellipsis; }
 }
+
+/* reports ------------------------------------------------------------------ */
+.report-tabs { margin-bottom: 18px; }
+.report-actions { display: flex; gap: 10px; margin-bottom: 26px; }
+.report-action {
+  font-family: var(--font-mono); font-size: 12px; color: var(--soft);
+  border: 1px solid var(--line); background: var(--panel); border-radius: 3px;
+  padding: 8px 14px; cursor: pointer; text-decoration: none;
+}
+.report-action:hover { color: var(--ink); border-color: var(--line-strong); }
+.report-head { margin-bottom: 20px; }
+.report-summary { margin: 8px 0 0; color: var(--soft); font-size: 14px; }
+.report-section { margin-bottom: 28px; }
+.report-section h2 { font-size: inherit; font-weight: inherit; margin: 0 0 12px; }
+.report-list { margin: 0; padding-left: 20px; color: var(--soft); font-size: 13.5px; line-height: 1.9; }
+.report-table {
+  width: 100%; border-collapse: collapse;
+  font-family: var(--font-mono); font-size: 12px; color: var(--soft);
+}
+.report-table th {
+  text-align: left; font-weight: 500; color: var(--muted);
+  padding: 8px 10px; border-bottom: 1px solid var(--line);
+}
+.report-table td { padding: 8px 10px; border-bottom: 1px solid rgba(120, 220, 205, 0.07); }
+.report-table .num { text-align: right; }
+/* A period with no recorded run is dimmed, so a gap reads as a gap at a glance
+   and is never mistaken for a measured zero. */
+.report-table .no-run td { color: var(--faint); }
+
+/* print: the report on paper, black on white, with the HUD out of the way.
+   The markdown export is the real shareable file; this is the pretty view. */
+@media print {
+  .grain, .field-vign, .frame, .topbar, .dock, .panel, .core-readout, .core-fallback,
+  #gl, canvas, .no-print { display: none !important; }
+  body { overflow: visible; background: #fff; color: #000; }
+  .page-wrap { max-width: none; margin: 0; padding: 0; }
+  .page-h { font-size: 20pt; margin-bottom: 4pt; }
+  .report-head { margin-bottom: 14pt; }
+  .report-summary, .report-list, .report-table { color: #000; }
+  .lbl { color: #000; }
+  .report-table th { color: #000; border-bottom: 1pt solid #000; }
+  .report-table td { border-bottom: 0.5pt solid #999; }
+  /* A gap still has to read as a gap once the dimming is gone. */
+  .report-table .no-run td { color: #000; font-style: italic; }
+  /* Sensible breaks: never split a section or a row across pages, keep a
+     heading with the rows it introduces, and repeat the header on page two. */
+  .report-section { break-inside: avoid; }
+  .report-section h2, .page-h { break-after: avoid; }
+  .report-table tr { break-inside: avoid; }
+  .report-table thead { display: table-header-group; }
+  @page { margin: 16mm; }
+}

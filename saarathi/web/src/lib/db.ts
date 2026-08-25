@@ -94,11 +94,11 @@ export interface RunRow {
   failed: number; flaky: number; health: number; at: string;
 }
 
-export function getRunHistory(projectId: string): RunRow[] {
+export function getRunHistory(projectId: string, limit = 30): RunRow[] {
   const db = getDb();
   if (!db) return [];
   try {
-    return db.prepare(`SELECT * FROM runs WHERE projectId = ? ORDER BY id DESC LIMIT 30`).all(projectId) as RunRow[];
+    return db.prepare(`SELECT * FROM runs WHERE projectId = ? ORDER BY id DESC LIMIT ?`).all(projectId, limit) as RunRow[];
   } catch {
     return [];
   }

@@ -7,6 +7,7 @@ const items = [
   { href: "/", label: "Command" },
   { href: "/agents", label: "Agents" },
   { href: "/signals", label: "Signals" },
+  { href: "/reports", label: "Reports" },
 ];
 
 export default function NavLinks() {

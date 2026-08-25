@@ -3,7 +3,9 @@ import { cookies } from "next/headers";
 import { getProjectConfig, getProjectConfigs } from "./config";
 import { scanProject } from "./scan";
 import { ensureProject, recordRunIfNew, getRunHistory, dbAvailable } from "./db";
+import { buildPending, buildReport } from "./report";
 import snapshot from "../data/snapshot.json";
+import type { Report, ProjectLine, ReportView } from "./report";
 import type { Overview, ProjectMeta } from "./types";
 
 // High-level data API used by the pages. Prefers live data scanned from the
@@ -50,4 +52,41 @@ export function getHistory(id?: string) {
 
 export function isDbLive(): boolean {
   return dbAvailable();
+}
+
+async function getProjectLines(): Promise<ProjectLine[]> {
+  return Promise.all(
+    getProjectConfigs().map(async (c) => {
+      const o = await getOverview(c.id);
+      return {
+        project: c,
+        live: o.live,
+        latest: getRunHistory(c.id, 1)[0] ?? null,
+        // A project whose folder is not on this machine falls back to the
+        // bundled snapshot, whose counts describe the demo and not that
+        // project. Report nothing rather than someone else's numbers.
+        open: o.live
+          ? {
+              bugs: o.counts.bugs,
+              doubts: o.counts.doubts,
+              // counts.recommendations includes the implemented ones, and this
+              // column is about what is still pending, so count the open ones.
+              recommendations: buildPending(o).recommendations.length,
+            }
+          : null,
+      };
+    })
+  );
+}
+
+/** Gathers the mirror data one report view needs, then shapes it in report.ts. */
+export async function getReport(view: ReportView, projectId?: string, now = new Date()): Promise<Report> {
+  const project = getProjectConfig(projectId);
+  const overview = await getOverview(project.id);
+  // ponytail: reads the recent rows and buckets them in memory, which is fine
+  // for a local single-file database. Push the bucketing into SQL if a project
+  // ever records more runs than this.
+  const rows = view === "daily" || view === "weekly" ? getRunHistory(project.id, 500) : [];
+  const projects = view === "projects" ? await getProjectLines() : [];
+  return buildReport({ view, project, now, rows, overview, projects });
 }
