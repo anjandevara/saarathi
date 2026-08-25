@@ -4,9 +4,10 @@ import { getProjectConfig, getProjectConfigs } from "./config";
 import { scanProject } from "./scan";
 import { ensureProject, recordRunIfNew, getRunHistory, dbAvailable } from "./db";
 import { buildPending, buildReport } from "./report";
+import { scanSpecs } from "./specs";
 import snapshot from "../data/snapshot.json";
 import type { Report, ProjectLine, ReportView } from "./report";
-import type { Overview, ProjectMeta } from "./types";
+import type { Overview, ProjectMeta, SpecFile } from "./types";
 
 // High-level data API used by the pages. Prefers live data scanned from the
 // configured Playwright project; falls back to a bundled snapshot so the app
@@ -48,6 +49,17 @@ export async function getOverview(id?: string): Promise<Overview> {
 export function getHistory(id?: string) {
   const cfg = getProjectConfig(id);
   return getRunHistory(cfg.id);
+}
+
+/**
+ * The project's spec files, read from the code. An empty list means the project
+ * has no specs where its Playwright config says they live, which is a fact
+ * worth showing rather than a reason to fall back to the snapshot.
+ */
+export async function getSpecs(id?: string): Promise<SpecFile[]> {
+  const cfg = getProjectConfig(id);
+  if (!cfg.path || !existsSync(cfg.path)) return [];
+  return scanSpecs(cfg.path);
 }
 
 export function isDbLive(): boolean {
