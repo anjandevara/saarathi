@@ -256,3 +256,64 @@ Status line says so (`/status:\s*\**\s*fixed/i`), which also correctly
 reads the bold `**Status:** FIXED` form. Locked by two regression tests in
 `tests-integration/scan.test.ts`. Severity: high for a QA tool, because it
 could silently hide open bugs. Found by exploratory testing.
+
+## 12. The 3D core canvas swallowed every click on a narrow screen
+
+**Status:** FIXED 2026-08-25 (verified: on-self Playwright suite, 7 passed)
+
+**Steps to reproduce:**
+1. Open Saarathi and make the window narrower than about 1100px, or open
+   it on a phone.
+2. Try to click any link in the top bar or the project rail.
+
+**Expected result:**
+The link is followed.
+
+**Actual result:**
+Nothing happens. No link in the chrome can be clicked at all, so the app
+has no working navigation on a small screen.
+
+**Comment:**
+`#gl` in `globals.css` is `position: fixed; inset: 0` covering the whole
+viewport, and took pointer events by default. Above the 1100px breakpoint
+this was invisible, because the top bar and panels are themselves
+positioned and paint above it. Below the breakpoint they become static, so
+the canvas painted over them and intercepted every click. Confirmed with
+`document.elementFromPoint` over each link at 390px: the topmost element
+was `CANVAS#gl` for the Reports link and for a rail link alike. The canvas
+is `aria-hidden` and listens for nothing but a window resize, so the fix is
+`pointer-events: none`. Severity: high on small screens, the app was
+unusable there. This predates the project rail; the Reports link had been
+affected for as long as the narrow breakpoint has existed. Found by the
+rail guard in `tests/saarathi/saarathi.spec.ts`, which asserts the page
+never scrolls sideways and reaches the rail at 390px.
+
+## 13. The suite health locator broke as soon as the project had a run
+
+**Status:** FIXED 2026-08-25 (verified: on-self Playwright suite, 7 passed)
+
+**Steps to reproduce:**
+1. Start from a project with no `reports/junit-results.xml`, so Saarathi
+   shows "No run yet". Run the on-self suite: it passes.
+2. That run writes `reports/junit-results.xml`.
+3. Run the on-self suite again.
+
+**Expected result:**
+The suite keeps passing. A project having been tested should not break the
+tests that watch it.
+
+**Actual result:**
+The smoke test failed with "Could not find Suite health label under the
+core ... text=Suite health -> 2 match(es)".
+
+**Comment:**
+The page object found the label by its text. Once a run exists the activity
+ticker also reads "Suite health N percent, ...", so the words matched two
+elements and `findElement` correctly refused to guess between them. The
+suite was therefore green only while the project had never been run, which
+is backwards for a tool that watches running projects. Fixed the way the
+framework's own error message recommends: a `data-testid` on the label
+under the core in `src/app/page.tsx`, which `findElement` tries first, with
+the text strategy left as a fallback. Severity: medium, a self-inflicted
+false failure rather than a user-facing defect. Found by running the
+on-self suite for real rather than reasoning about it.
