@@ -146,4 +146,112 @@ test.describe('Saarathi command center: on-self checks', () => {
       expect(old.status()).toBe(404);
     });
   });
+
+  // The per-project rail is layout, and the Node integration suite cannot see
+  // layout. These checks are the durable guard. They assert structure and one
+  // invariant, never pixel offsets, so restyling the rail does not break them
+  // but removing or unlabelling it does.
+  test('the project rail lists every section and marks the open one @regression @readOnly', async ({ page, logger }) => {
+    await epic('Saarathi');
+    await feature('Project rail');
+    await story('The rail names the project sections and shows which one is open');
+    await description(
+      'WHAT: confirm the rail is a labelled landmark holding the five sections, and that the open one is marked.\n' +
+      'WHY: the sections moved out of the top bar into the rail, so the rail is now the only way to reach them. ' +
+      'If it disappears or stops marking the current section, the app loses its navigation silently.\n' +
+      'HOW: find the rail by its navigation landmark and read aria-current, never a css class or a pixel position.'
+    );
+
+    const saarathi = new SaarathiPage(page, logger);
+
+    await test.step('Given the rail is a labelled navigation landmark with every section', async () => {
+      await expect(await saarathi.getRail()).toBeVisible();
+      await expect(await saarathi.getRailSections()).toHaveText([
+        'Overview',
+        'Agents',
+        'Test cases',
+        'Data and fixtures',
+        'Signals',
+      ]);
+    });
+
+    await test.step('And the home marks Overview as the open section', async () => {
+      await expect(await saarathi.getActiveRailSection()).toHaveText('Overview');
+    });
+
+    await test.step('When I open Test cases from the rail', async () => {
+      await saarathi.goToRailSection('Test cases');
+    });
+
+    await test.step('Then the rail marks Test cases, and only that', async () => {
+      await expect(await saarathi.getActiveRailSection()).toHaveText('Test cases');
+      await expect(await saarathi.getActiveRailSection()).toHaveCount(1);
+    });
+
+    await test.step('And opening another section moves the mark with it', async () => {
+      await saarathi.goToRailSection('Data and fixtures');
+      await expect(await saarathi.getActiveRailSection()).toHaveText('Data and fixtures');
+    });
+  });
+
+  test('the rail marks no section on the global Reports view @regression @readOnly', async ({ page, logger }) => {
+    await epic('Saarathi');
+    await feature('Project rail');
+    await story('Reports is global, so no project section is marked open');
+    await description(
+      'WHAT: open Reports and confirm the rail is still there with nothing marked as current.\n' +
+      'WHY: Reports is not one of the project sections. Marking one of them would tell the reader they are ' +
+      'somewhere they are not, and dropping the rail would strand them.\n' +
+      'HOW: navigate to Reports, then assert the rail is present and aria-current matches nothing.'
+    );
+
+    const saarathi = new SaarathiPage(page, logger);
+
+    await test.step('When I open Reports from the top bar', async () => {
+      await saarathi.goToReports();
+    });
+
+    await test.step('Then the rail is still present', async () => {
+      await expect(await saarathi.getRail()).toBeVisible();
+      await expect(await saarathi.getRailSections()).toHaveCount(5);
+    });
+
+    await test.step('And no section is marked as the open one', async () => {
+      await expect(await saarathi.getActiveRailSection()).toHaveCount(0);
+    });
+  });
+
+  test('the layout never scrolls sideways at a narrow width @regression @readOnly', async ({ page, logger }) => {
+    await epic('Saarathi');
+    await feature('Project rail');
+    await story('The rail collapses on a narrow screen without pushing the page sideways');
+    await description(
+      'WHAT: at a phone width, confirm the rail is still reachable and the document is not wider than the viewport.\n' +
+      'WHY: a fixed rail is the classic cause of a page that slides sideways on a phone. This is the one ' +
+      'geometric fact worth locking in, because it is felt by a reader rather than measured in pixels.\n' +
+      'HOW: resize to a narrow viewport, then compare scrollWidth against clientWidth on the document.'
+    );
+
+    const saarathi = new SaarathiPage(page, logger);
+
+    await test.step('When I view the app at a narrow width', async () => {
+      await page.setViewportSize({ width: 390, height: 780 });
+      await saarathi.openHome();
+    });
+
+    await test.step('Then the rail is still there', async () => {
+      await expect(await saarathi.getRail()).toBeVisible();
+      await expect(await saarathi.getRailSections()).toHaveCount(5);
+    });
+
+    await test.step('And the page does not scroll sideways', async () => {
+      expect(await saarathi.scrollsSideways()).toBe(false);
+    });
+
+    await test.step('And a section page does not either', async () => {
+      await saarathi.goToRailSection('Test cases');
+      await expect(await saarathi.getActiveRailSection()).toHaveText('Test cases');
+      expect(await saarathi.scrollsSideways()).toBe(false);
+    });
+  });
 });
