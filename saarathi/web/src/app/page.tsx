@@ -37,7 +37,12 @@ export default async function Home() {
                 <span>%</span>
               </div>
               <div className="cap">
-                <span className="lbl">Suite health</span>
+                {/* The activity ticker also says "Suite health N percent" once a
+                    run exists, so the words alone no longer identify this label.
+                    A test id names it without depending on the copy. */}
+                <span className="lbl" data-testid="suite-health">
+                  Suite health
+                </span>
               </div>
               <div className="sub2">
                 last run &middot; {run.total} tests &middot; {run.passed} passing
