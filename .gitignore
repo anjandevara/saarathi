@@ -1,5 +1,8 @@
 node_modules/
-reports/
+# Anchored to the repo root on purpose. An unanchored "reports/" matches any
+# directory of that name at any depth, which silently hid the Saarathi app's
+# own src/app/reports route from git.
+/reports/
 test-results/
 *.log
 

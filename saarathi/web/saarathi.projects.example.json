@@ -1,0 +1,14 @@
+[
+  {
+    "_comment": "Set id to playwright-framework for this repo. The id is the key the run history is stored under, so leaving it to default from the folder name (playwright-ai-framework) would hide the runs already recorded. Any other key here, like this one, is ignored.",
+    "id": "playwright-framework",
+    "name": "Playwright Framework",
+    "path": "/absolute/path/to/playwright-ai-framework",
+    "env": "local"
+  },
+  {
+    "_comment": "A new project needs only a path. The id, name, and env default from the folder name.",
+    "path": "/absolute/path/to/another-project",
+    "env": "staging"
+  }
+]

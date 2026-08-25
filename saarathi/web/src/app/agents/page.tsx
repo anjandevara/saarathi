@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getOverview } from "@/lib/data";
+import { getCurrentProjectId, getOverview } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Agents" };
 export const dynamic = "force-dynamic";
@@ -12,7 +12,7 @@ const DOT: Record<string, string> = {
 };
 
 export default async function AgentsPage() {
-  const o = await getOverview();
+  const o = await getOverview(await getCurrentProjectId());
   return (
     <main className="page-wrap">
       <h1 className="page-h">Agents</h1>

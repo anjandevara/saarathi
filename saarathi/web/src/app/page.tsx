@@ -1,5 +1,5 @@
 import CommandCore from "@/components/CommandCore";
-import { getOverview } from "@/lib/data";
+import { getCurrentProjectId, getOverview } from "@/lib/data";
 
 // Always reflect the current project state (reads files at request time).
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ function Bar({ kind, label, value, total }: { kind: string; label: string; value
 }
 
 export default async function Home() {
-  const o = await getOverview();
+  const o = await getOverview(await getCurrentProjectId());
   const run = o.run;
   const health = run ? run.health : 0;
 

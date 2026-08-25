@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Saarathi project list: machine-specific absolute paths.
+# Copy saarathi.projects.example.json to saarathi.projects.json to use it.
+saarathi.projects.json
