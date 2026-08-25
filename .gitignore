@@ -1,0 +1,21 @@
+node_modules/
+reports/
+test-results/
+*.log
+
+# Never commit real credentials. The files under config/environments/ hold
+# non-secret defaults only (like BASE_URL). Real secrets (Amazon Web
+# Services keys, S3 bucket name, anything sensitive) belong in a root
+# .env file, which is excluded here on purpose. In CI/CD, the same
+# variable names are set directly in the pipeline's own settings instead.
+.env
+.env.local
+.next/
+.DS_Store
+.saarathi/
+_to_delete/
+playwright-report/
+allure-results/
+blob-report/
+saarathi-screenshots/
+saarathi-screenshots/

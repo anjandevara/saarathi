@@ -1,0 +1,282 @@
+@import "tailwindcss";
+
+/*
+  Saarathi design tokens.
+  Semantic tokens only, no per-screen hardcoded colors (ui-ux-pro-max rule).
+  Committed dark visual world: the command-center identity.
+*/
+:root {
+  --bg: #05080c;
+  --bg-2: #070c12;
+  --ink: #e6f2ef;
+  --soft: #a9c4bf;
+  --muted: #6d8a85;
+  --faint: #496862;
+
+  --accent: #33e2c6;        /* teal, the single jewel accent */
+  --accent-ink: #7fe0d3;
+  --accent-deep: #0c6e63;
+
+  --good: #35e0c4;
+  --info: #5db6ff;
+  --warn: #e6b45c;
+  --danger: #ff6b6b;
+
+  --line: rgba(120, 220, 205, 0.16);
+  --line-strong: rgba(120, 220, 205, 0.30);
+  --hairline: 255 255 255;
+
+  --panel: rgba(10, 20, 24, 0.42);
+  --panel-2: rgba(8, 16, 20, 0.62);
+  --glass-border: rgba(120, 220, 205, 0.16);
+  --glow: 0 0 24px rgba(51, 226, 198, 0.18);
+  --shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.7);
+
+  /* type scale (ui-ux-pro-max: consistent scale) */
+  --fs-11: 11px; --fs-12: 12px; --fs-13: 13px; --fs-14: 14px;
+  --fs-16: 16px; --fs-18: 18px; --fs-22: 22px; --fs-30: 30px; --fs-44: 44px;
+
+  /* spacing rhythm 4/8 system */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-6: 24px; --sp-8: 32px; --sp-12: 48px;
+
+  /* z-index scale */
+  --z-bg: 0; --z-frame: 3; --z-panel: 5; --z-overlay: 40; --z-toast: 1000;
+
+  /* motion tokens (ease-out enter, ease-in exit) */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --ease-in: cubic-bezier(0.5, 0, 0.75, 0);
+  --dur-micro: 180ms;
+  --dur-enter: 260ms;
+  --dur-exit: 170ms;
+
+  --font-hud: "Chakra Petch", system-ui, sans-serif;
+  --font-body: "Manrope", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; min-height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+.mono { font-family: var(--font-mono); }
+.hud { font-family: var(--font-hud); }
+.lbl {
+  font-family: var(--font-hud);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* focus ring (ui-ux-pro-max accessibility) */
+:where(a, button, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* atmosphere behind the 3D canvas */
+.field-vign {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(120% 120% at 50% 42%, transparent 50%, rgba(0, 0, 0, 0.62));
+}
+.grain {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.05;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* corner frame */
+.frame { position: fixed; inset: 20px; z-index: var(--z-frame); pointer-events: none; }
+.corner { position: absolute; width: 46px; height: 46px; border: 1px solid var(--line-strong); }
+.corner.tl { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+.corner.tr { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+.corner.bl { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+.corner.br { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+
+/* top bar */
+.topbar {
+  position: fixed; z-index: var(--z-panel); top: 34px; left: 52px; right: 52px;
+  display: flex; align-items: center; gap: 18px;
+}
+.brand { display: flex; align-items: center; gap: 13px; }
+.brand .mk svg { width: 34px; height: 34px; filter: drop-shadow(0 0 8px rgba(51, 226, 198, 0.5)); }
+.brand .nm { font-family: var(--font-hud); font-weight: 700; font-size: 19px; letter-spacing: 0.34em; padding-left: 0.2em; }
+.sep { width: 1px; height: 26px; background: var(--line); }
+/* Status display of the current project. Not interactive yet (multi-project
+   switching is on the roadmap), so it does not use a pointer cursor or a
+   hover state that would imply it is clickable. Bug 2 fix. */
+.proj {
+  display: flex; align-items: center; gap: 9px; padding: 7px 13px;
+  border: 1px solid var(--line); background: var(--panel); border-radius: 3px;
+  font-family: var(--font-mono); font-size: 12.5px; color: var(--soft);
+}
+.proj .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.status-r { margin-left: auto; display: flex; align-items: center; gap: 22px; }
+.nominal { display: flex; align-items: center; gap: 9px; }
+.nominal .d { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); animation: blip 2.4s infinite; }
+.readout { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.readout b { color: var(--soft); font-weight: 500; }
+
+/* nav (secondary screens link row inside topbar) */
+.nav-row { display: flex; gap: 4px; }
+.nav-row a {
+  font-family: var(--font-hud); text-transform: uppercase; letter-spacing: 0.14em;
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  padding: 8px 13px; border-radius: 3px; border: 1px solid transparent;
+  transition: color var(--dur-micro), background var(--dur-micro), border-color var(--dur-micro);
+}
+.nav-row a:hover { color: var(--ink); background: rgb(var(--hairline) / 0.05); }
+.nav-row a[aria-current="page"] { color: var(--accent-ink); border-color: var(--line); background: var(--panel); }
+
+/* panels */
+.panel {
+  position: fixed; z-index: var(--z-panel); width: 300px; background: var(--panel-2);
+  border: 1px solid var(--line); border-radius: 2px; box-shadow: var(--glow);
+  backdrop-filter: blur(6px);
+  /* Never overlap the bottom dock on short windows: cap height and scroll. Bug 9 fix. */
+  max-height: calc(100vh - 240px); overflow-y: auto;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+}
+.panel .head { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid var(--line); }
+.panel .head .n { font-family: var(--font-mono); font-size: 11px; color: var(--accent); }
+.panel .body { padding: 14px 16px; }
+.panel.left { left: 52px; top: 150px; }
+.panel.right { right: 52px; top: 150px; }
+
+.metric { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+.metric .v { font-family: var(--font-hud); font-weight: 700; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; color: var(--accent); }
+.metric .u { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.bars { display: flex; flex-direction: column; gap: 11px; }
+.bar .t { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11.5px; margin-bottom: 5px; }
+.bar .t .k { color: var(--soft); }
+.bar .t .val { color: var(--muted); }
+.track { height: 5px; background: rgba(120, 220, 205, 0.08); border-radius: 2px; overflow: hidden; }
+.fill { height: 100%; border-radius: 2px; }
+.fill.pass { background: linear-gradient(90deg, var(--accent-deep), var(--accent)); box-shadow: 0 0 10px rgba(51, 226, 198, 0.5); }
+.fill.fail { background: linear-gradient(90deg, #a23b3b, var(--danger)); }
+.fill.flaky { background: linear-gradient(90deg, #9a7433, var(--warn)); }
+
+.agent-row { display: flex; align-items: center; gap: 11px; padding: 9px 0; border-bottom: 1px solid rgba(120, 220, 205, 0.07); }
+.agent-row:last-child { border-bottom: 0; }
+.agent-row .d { width: 7px; height: 7px; border-radius: 50%; flex: 0 0 auto; }
+.agent-row .d.idle { background: var(--faint); }
+.agent-row .d.on { background: var(--accent); box-shadow: 0 0 9px var(--accent); }
+.agent-row .d.work { background: var(--info); box-shadow: 0 0 9px var(--info); animation: blip 1.6s infinite; }
+.agent-row .d.wait { background: var(--warn); box-shadow: 0 0 9px var(--warn); animation: blip 1.2s infinite; }
+.agent-row .nm { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.agent-row .st { margin-left: auto; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.03em; text-transform: uppercase; }
+.agent-row .st.idle { color: var(--faint); }
+.agent-row .st.on { color: var(--accent); }
+.agent-row .st.work { color: var(--info); }
+.agent-row .st.wait { color: var(--warn); }
+
+/* center readout over the 3D core */
+.core-readout {
+  position: fixed; z-index: var(--z-panel); inset: 0; display: grid; place-items: center;
+  text-align: center; pointer-events: none;
+}
+.core-readout .inner { position: relative; }
+.core-readout .inner::before {
+  content: ""; position: absolute; inset: -46px -96px; z-index: -1;
+  background: radial-gradient(closest-side, rgba(5, 8, 12, 0.9), rgba(5, 8, 12, 0.55) 52%, transparent 80%);
+  filter: blur(7px);
+}
+.core-readout .big { font-family: var(--font-hud); font-weight: 700; font-size: 52px; line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 0 26px rgba(5, 8, 12, 1), 0 2px 12px rgba(5, 8, 12, 1); }
+.core-readout .big span { color: var(--accent); }
+.core-readout .cap { margin-top: 8px; }
+.core-readout .cap .lbl { color: #c6ece5; }
+.core-readout .sub2 { margin-top: 3px; font-family: var(--font-mono); font-size: 11.5px; color: #93b7b1; }
+
+/* bottom dock */
+.dock { position: fixed; z-index: var(--z-panel); left: 52px; right: 52px; bottom: 34px; display: flex; align-items: stretch; gap: 14px; }
+.ticker {
+  flex: 1; display: flex; align-items: center; gap: 16px; padding: 13px 18px;
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 2px; overflow: hidden;
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+.ticker .lbl { color: var(--accent); flex: 0 0 auto; }
+/* Activity is a real scrolling ticker so the full text is readable, not
+   clipped. The full text is also on the title attribute (hover) as a
+   non-motion fallback. Bug 4 fix. */
+.ticker .stream-wrap { flex: 1; overflow: hidden; min-width: 0; }
+.ticker .stream {
+  display: inline-block; white-space: nowrap; padding-left: 100%;
+  font-family: var(--font-mono); font-size: 12px; color: var(--soft);
+  animation: marquee 34s linear infinite;
+}
+.ticker:hover .stream { animation-play-state: paused; }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+.counts { display: flex; gap: 10px; flex: 0 0 auto; }
+.count {
+  min-width: 90px; padding: 11px 15px; background: var(--panel-2); border: 1px solid var(--line);
+  border-radius: 2px; text-align: center;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+.count .v { font-family: var(--font-hud); font-weight: 700; font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums; }
+.count .v.warn { color: var(--warn); }
+.count .v.teal { color: var(--accent); }
+.count .l { margin-top: 5px; font-family: var(--font-hud); text-transform: uppercase; letter-spacing: 0.14em; font-size: 9px; color: var(--muted); }
+
+#gl { position: fixed; inset: 0; z-index: var(--z-bg); display: block; width: 100vw; height: 100vh; }
+
+/* Static fallback shown when WebGL is unavailable, so the home hero is never
+   just a blank black area. Bug 6 fix. */
+.core-fallback { position: fixed; inset: 0; z-index: var(--z-bg); display: grid; place-items: center; pointer-events: none; }
+.core-fallback .ring {
+  width: 340px; height: 340px; border-radius: 50%;
+  border: 1.5px solid rgba(51, 226, 198, 0.28);
+  box-shadow: inset 0 0 70px rgba(51, 226, 198, 0.10), 0 0 44px rgba(51, 226, 198, 0.07);
+}
+.core-fallback .ring::after {
+  content: ""; display: block; width: 62%; height: 62%; margin: 19% auto; border-radius: 50%;
+  border: 1px solid rgba(51, 226, 198, 0.18);
+}
+
+/* content pages (agents, signals) */
+.page-wrap { position: relative; z-index: var(--z-panel); max-width: 1100px; margin: 0 auto; padding: 120px 40px 80px; }
+.page-h { font-family: var(--font-hud); font-weight: 700; letter-spacing: 0.02em; font-size: 30px; margin: 0 0 6px; }
+.page-sub { color: var(--muted); font-size: 14px; margin: 0 0 32px; max-width: 60ch; }
+.card {
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 2px; padding: 18px 20px;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+}
+.grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.empty-state { color: var(--faint); font-family: var(--font-mono); font-size: 13px; padding: 40px; text-align: center; border: 1px dashed var(--line); border-radius: 2px; }
+
+@keyframes blip { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+  /* Without the marquee animation the padded stream would sit off-screen,
+     so reset it to a plain clipped line (full text stays on the title). */
+  .ticker .stream { padding-left: 0 !important; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+}
+
+/* Below 1100px the fixed HUD layout would overlap, so the home screen becomes
+   a normal scrolling column with the 3D core dimmed as a backdrop. Bug 1 fix. */
+@media (max-width: 1100px) {
+  body { overflow-y: auto; }
+  .frame { display: none; }
+  .topbar { position: static; margin: 16px; flex-wrap: wrap; row-gap: 10px; }
+  .status-r { margin-left: 0; flex-wrap: wrap; }
+  .core-readout { position: static; inset: auto; display: block; margin: 36px 16px 8px; }
+  .core-readout .inner::before { display: none; }
+  .panel { position: static; width: auto; max-height: none; overflow: visible; margin: 12px 16px; }
+  .panel.left, .panel.right { left: auto; right: auto; top: auto; }
+  .dock { position: static; margin: 16px; flex-direction: column; }
+  .counts { flex-wrap: wrap; }
+  #gl { opacity: 0.32; }
+  .ticker .stream { animation: none; padding-left: 0; overflow: hidden; text-overflow: ellipsis; }
+}

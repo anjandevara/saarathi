@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Saarathi People</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+<style>
+  :root {
+    --bg: #e9eef6;
+    --bg-2: #eef2f8;
+    --paper: 255 255 255;
+    --ink: #16202e;
+    --muted: #59697b;
+    --faint: #8a99a9;
+    --line: 255 255 255;
+    --hairline: 20 32 46;
+    --accent: #0c6e63;
+    --accent-ink: #0a564d;
+    --good: #2f9e6a;
+    --warn: #b7791f;
+    --glass: rgba(255,255,255,0.62);
+    --glass-strong: rgba(255,255,255,0.78);
+    --glass-border: rgba(255,255,255,0.7);
+    --shadow: 0 20px 50px -24px rgba(22,32,46,0.35);
+    --shadow-sm: 0 8px 24px -16px rgba(22,32,46,0.4);
+    --bloom-a: rgba(30,150,140,0.34);
+    --bloom-b: rgba(120,150,235,0.30);
+    --bloom-c: rgba(238,170,155,0.30);
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --bg: #0c1119;
+      --bg-2: #0e1520;
+      --paper: 22 30 42;
+      --ink: #eaf0f7;
+      --muted: #9fb0c2;
+      --faint: #6d7d8f;
+      --hairline: 255 255 255;
+      --accent: #4fd1c0;
+      --accent-ink: #7fe0d3;
+      --good: #4bbd86;
+      --warn: #e0a95a;
+      --glass: rgba(26,35,49,0.55);
+      --glass-strong: rgba(28,38,54,0.72);
+      --glass-border: rgba(255,255,255,0.10);
+      --shadow: 0 24px 60px -28px rgba(0,0,0,0.7);
+      --shadow-sm: 0 10px 28px -18px rgba(0,0,0,0.7);
+      --bloom-a: rgba(20,120,110,0.30);
+      --bloom-b: rgba(70,90,180,0.28);
+      --bloom-c: rgba(150,90,80,0.24);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c1119;
+    --bg-2: #0e1520;
+    --paper: 22 30 42;
+    --ink: #eaf0f7;
+    --muted: #9fb0c2;
+    --faint: #6d7d8f;
+    --hairline: 255 255 255;
+    --accent: #4fd1c0;
+    --accent-ink: #7fe0d3;
+    --good: #4bbd86;
+    --warn: #e0a95a;
+    --glass: rgba(26,35,49,0.55);
+    --glass-strong: rgba(28,38,54,0.72);
+    --glass-border: rgba(255,255,255,0.10);
+    --shadow: 0 24px 60px -28px rgba(0,0,0,0.7);
+    --shadow-sm: 0 10px 28px -18px rgba(0,0,0,0.7);
+    --bloom-a: rgba(20,120,110,0.30);
+    --bloom-b: rgba(70,90,180,0.28);
+    --bloom-c: rgba(150,90,80,0.24);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+  /* Soft depth blooms behind the glass, so the frost has something to refract. */
+  .field {
+    position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+    background:
+      radial-gradient(48rem 48rem at 12% -6%, var(--bloom-a), transparent 60%),
+      radial-gradient(42rem 42rem at 92% 8%, var(--bloom-b), transparent 62%),
+      radial-gradient(40rem 40rem at 70% 108%, var(--bloom-c), transparent 60%),
+      linear-gradient(180deg, var(--bg), var(--bg-2));
+  }
+  .grain { position: fixed; inset: 0; z-index: 0; opacity: .5; pointer-events: none;
+    background-image: radial-gradient(rgba(22,32,46,0.035) 1px, transparent 1px);
+    background-size: 4px 4px; }
+
+  .shell {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 264px 1fr;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .side {
+    position: sticky; top: 0; align-self: start; height: 100vh;
+    margin: 14px 0 14px 14px; padding: 22px 18px;
+    background: var(--glass); backdrop-filter: blur(26px) saturate(1.4); -webkit-backdrop-filter: blur(26px) saturate(1.4);
+    border: 1px solid var(--glass-border); border-radius: 22px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 26px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; padding: 4px 6px; }
+  .mark {
+    width: 38px; height: 38px; border-radius: 12px; flex: 0 0 auto;
+    background: linear-gradient(145deg, var(--accent), #12938a);
+    display: grid; place-items: center; color: #fff; box-shadow: 0 8px 18px -8px rgba(12,110,99,0.7);
+  }
+  .mark svg { width: 21px; height: 21px; }
+  .wordmark { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 22px; letter-spacing: .1px; line-height: 1; }
+  .wordmark small { display: block; font-family: "Manrope", sans-serif; font-weight: 600; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); margin-top: 5px; }
+
+  .nav { display: flex; flex-direction: column; gap: 3px; }
+  .nav-label { font-size: 10.5px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--faint); padding: 0 10px 8px; }
+  .nav a {
+    display: flex; align-items: center; gap: 11px; padding: 10px 11px; border-radius: 12px;
+    color: var(--muted); text-decoration: none; font-weight: 600; font-size: 14px; letter-spacing: .1px;
+    transition: background .18s ease, color .18s ease;
+  }
+  .nav a svg { width: 18px; height: 18px; opacity: .85; }
+  .nav a:hover { background: rgb(var(--hairline) / .05); color: var(--ink); }
+  .nav a.active { background: rgb(var(--paper) / .9); color: var(--accent-ink); box-shadow: var(--shadow-sm); }
+  :root[data-theme="dark"] .nav a.active, :root:not([data-theme="light"]) .nav a.active { background: rgb(var(--paper) / .7); }
+  .nav a.active svg { opacity: 1; }
+
+  .side-foot { margin-top: auto; display: flex; align-items: center; gap: 11px; padding: 10px; border-radius: 14px; background: rgb(var(--hairline) / .04); }
+  .side-foot .av { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(145deg,#324a63,#1f2f42); color:#fff; display:grid; place-items:center; font-weight:700; font-size:13px; }
+  .side-foot .who { line-height: 1.25; }
+  .side-foot .who b { font-size: 13px; font-weight: 700; }
+  .side-foot .who span { display:block; font-size: 11.5px; color: var(--faint); }
+
+  /* Main */
+  .main { padding: 14px 26px 40px 26px; min-width: 0; }
+  .topbar {
+    position: sticky; top: 14px; z-index: 5;
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 14px 12px 20px; margin-bottom: 26px;
+    background: var(--glass-strong); backdrop-filter: blur(26px) saturate(1.4); -webkit-backdrop-filter: blur(26px) saturate(1.4);
+    border: 1px solid var(--glass-border); border-radius: 18px; box-shadow: var(--shadow);
+  }
+  .crumbs { font-size: 13px; color: var(--faint); font-weight: 600; }
+  .crumbs b { color: var(--ink); }
+  .search { margin-left: auto; position: relative; width: min(360px, 42vw); }
+  .search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--faint); }
+  .search input {
+    width: 100%; padding: 10px 14px 10px 38px; border-radius: 12px;
+    border: 1px solid var(--glass-border); background: rgb(var(--paper) / .6); color: var(--ink);
+    font: inherit; font-size: 13.5px; font-weight: 500; outline: none;
+    transition: box-shadow .18s ease, border-color .18s ease, background .18s;
+  }
+  .search input::placeholder { color: var(--faint); }
+  .search input:focus { border-color: rgb(12 110 99 / .5); box-shadow: 0 0 0 4px rgb(12 110 99 / .12); background: rgb(var(--paper) / .85); }
+  .icon-btn { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgb(var(--paper) / .5); color: var(--muted); display: grid; place-items: center; cursor: pointer; transition: background .18s, color .18s; }
+  .icon-btn:hover { background: rgb(var(--paper) / .85); color: var(--ink); }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  /* Page header */
+  .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 22px; flex-wrap: wrap; }
+  .page-head h1 { font-family: "Fraunces", Georgia, serif; font-weight: 500; font-size: clamp(30px, 4vw, 44px); line-height: 1.02; margin: 0 0 8px; letter-spacing: -.2px; text-wrap: balance; }
+  .page-head p { margin: 0; color: var(--muted); font-size: 15px; max-width: 52ch; }
+  .demo-badge { display:inline-flex; align-items:center; gap:7px; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; color: var(--accent-ink); background: rgb(12 110 99 / .1); border: 1px solid rgb(12 110 99 / .2); padding: 5px 11px; border-radius: 999px; }
+  .demo-badge i { width:6px; height:6px; border-radius:50%; background: var(--accent); display:inline-block; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 26px; }
+  .stat {
+    background: var(--glass); backdrop-filter: blur(20px) saturate(1.3); -webkit-backdrop-filter: blur(20px) saturate(1.3);
+    border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px 18px; box-shadow: var(--shadow-sm);
+  }
+  .stat .k { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 30px; line-height: 1; letter-spacing: -.5px; font-variant-numeric: tabular-nums; }
+  .stat .l { margin-top: 7px; font-size: 12.5px; font-weight: 600; color: var(--faint); letter-spacing: .02em; }
+
+  /* Filters */
+  .filters { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 22px; }
+  .chip {
+    border: 1px solid var(--glass-border); background: rgb(var(--paper) / .5); color: var(--muted);
+    padding: 8px 15px; border-radius: 999px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: background .16s, color .16s, border-color .16s, box-shadow .16s;
+  }
+  .chip:hover { color: var(--ink); background: rgb(var(--paper) / .8); }
+  .chip[aria-pressed="true"] { background: var(--ink); color: rgb(var(--bg)); border-color: transparent; box-shadow: var(--shadow-sm); }
+
+  /* Directory grid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(288px, 1fr)); gap: 16px; }
+  .card {
+    position: relative; background: var(--glass); backdrop-filter: blur(22px) saturate(1.35); -webkit-backdrop-filter: blur(22px) saturate(1.35);
+    border: 1px solid var(--glass-border); border-radius: 18px; padding: 18px; box-shadow: var(--shadow-sm);
+    transition: transform .2s cubic-bezier(.2,.7,.3,1), box-shadow .2s ease, border-color .2s;
+    animation: rise .5s cubic-bezier(.2,.7,.3,1) both;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: rgb(12 110 99 / .35); }
+  .card-top { display: flex; align-items: center; gap: 13px; }
+  .av {
+    width: 50px; height: 50px; border-radius: 14px; flex: 0 0 auto; display: grid; place-items: center;
+    font-weight: 800; font-size: 16px; letter-spacing: .3px;
+    background: rgb(var(--c) / .16); color: color-mix(in oklab, rgb(var(--c)), var(--ink) 12%);
+    box-shadow: inset 0 0 0 1.5px rgb(var(--c) / .34);
+  }
+  .who2 { min-width: 0; }
+  .who2 .nm { font-weight: 700; font-size: 15.5px; letter-spacing: -.1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .who2 .tt { font-size: 13px; color: var(--muted); font-weight: 500; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row { display: flex; align-items: center; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
+  .dept { font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 8px; background: rgb(var(--c) / .13); color: color-mix(in oklab, rgb(var(--c)), var(--ink) 20%); }
+  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; padding: 4px 9px; border-radius: 999px; }
+  .pill i { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .pill.active { color: var(--good); background: rgb(47 158 106 / .12); }
+  .pill.active i { background: var(--good); }
+  .pill.leave { color: var(--warn); background: rgb(183 121 31 / .13); }
+  .pill.leave i { background: var(--warn); }
+  .meta { margin-top: 15px; padding-top: 14px; border-top: 1px solid rgb(var(--hairline) / .08); display: flex; flex-direction: column; gap: 7px; }
+  .meta div { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+  .meta svg { width: 14px; height: 14px; color: var(--faint); flex: 0 0 auto; }
+  .meta .id { margin-left: auto; font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--faint); letter-spacing: -.2px; }
+  .empty { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--faint); font-weight: 600; }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .card { animation: none; } * { transition: none !important; } }
+
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .side { position: static; height: auto; margin: 14px; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .side .nav, .side .nav-label { display: none; }
+    .side-foot { margin-top: 0; margin-left: auto; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+  <div class="field"></div>
+  <div class="grain"></div>
+
+  <div class="shell">
+    <aside class="side">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 18c3.5 0 3.5-12 7-12s3.5 12 7 12" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="19.5" cy="18" r="1.7" fill="currentColor"/></svg>
+        </span>
+        <span class="wordmark">Saarathi<small>People</small></span>
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <span class="nav-label">Workspace</span>
+        <a href="#" class="active" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 20c0-3.3 2.7-6 6-6s6 2.7 6 6M13 7a3 3 0 11-6 0 3 3 0 016 0zM17.5 13.5a2.5 2.5 0 10-2-4.5M20 20c0-2-.9-3.8-2.3-5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          People
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="9" y="3" width="6" height="4.5" rx="1.4" stroke="currentColor" stroke-width="1.9"/><rect x="3.5" y="15.5" width="6" height="4.5" rx="1.4" stroke="currentColor" stroke-width="1.9"/><rect x="14.5" y="15.5" width="6" height="4.5" rx="1.4" stroke="currentColor" stroke-width="1.9"/><path d="M12 7.5v3.5M12 11h-5.5v4.5M12 11h5.5v4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+          Org Chart
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 4h14v16l-7-3-7 3V4z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>
+          Directory
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 19V9m5 10V5m5 14v-7m5 7V8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+          Reports
+        </a>
+        <span class="nav-label" style="margin-top:14px">Manage</span>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.9"/><path d="M19 12a7 7 0 00-.1-1l2-1.6-2-3.4-2.3.9a7 7 0 00-1.7-1l-.4-2.4H9.5L9 5.9a7 7 0 00-1.7 1L5 6l-2 3.4L5 11a7 7 0 000 2l-2 1.6 2 3.4 2.3-.9a7 7 0 001.7 1l.4 2.4h4.9l.4-2.4a7 7 0 001.7-1l2.3.9 2-3.4-2-1.6c.1-.3.1-.7.1-1z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          Settings
+        </a>
+      </nav>
+
+      <div class="side-foot">
+        <span class="av">GM</span>
+        <span class="who"><b>Grace Miller</b><span>Head of People</span></span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <span class="crumbs">Workspace / <b>People</b></span>
+        <label class="search">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.2-3.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="q" type="text" placeholder="Search people, titles, locations..." autocomplete="off" />
+        </label>
+        <button class="icon-btn" id="theme" title="Toggle theme" aria-label="Toggle theme">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M21 12.8A8 8 0 1111.2 3a6.2 6.2 0 009.8 9.8z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon-btn" title="New employee" aria-label="Add employee">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <div class="page-head">
+        <div>
+          <h1>People at Saarathi</h1>
+          <p>Everyone in the organisation, their place in the reporting line, and where they work. One calm view of the whole team.</p>
+        </div>
+        <span class="demo-badge"><i></i> Demo data, fully synthetic</span>
+      </div>
+
+      <section class="stats" id="stats" aria-label="Summary"></section>
+
+      <div class="filters" id="filters" role="group" aria-label="Filter by department"></div>
+
+      <section class="grid" id="grid" aria-label="Employee directory"></section>
+    </main>
+  </div>
+
+<script>
+  const EMPLOYEES = [
+    { id:"SAR-001", name:"Aparna Rao", title:"Chief Executive Officer", department:"Executive", managerId:null, location:"Bengaluru", status:"Active" },
+    { id:"SAR-002", name:"Vikram Menon", title:"VP of Engineering", department:"Engineering", managerId:"SAR-001", location:"Bengaluru", status:"Active" },
+    { id:"SAR-003", name:"Nisha Kapoor", title:"VP of Product", department:"Product", managerId:"SAR-001", location:"Pune", status:"Active" },
+    { id:"SAR-004", name:"Daniel Osei", title:"VP of Revenue", department:"Revenue", managerId:"SAR-001", location:"London", status:"Active" },
+    { id:"SAR-005", name:"Farah Siddiqui", title:"Head of Design", department:"Design", managerId:"SAR-003", location:"Pune", status:"Active" },
+    { id:"SAR-006", name:"Rohan Iyer", title:"Director of Engineering", department:"Engineering", managerId:"SAR-002", location:"Bengaluru", status:"Active" },
+    { id:"SAR-007", name:"Meera Nair", title:"Engineering Manager", department:"Engineering", managerId:"SAR-006", location:"Bengaluru", status:"Active" },
+    { id:"SAR-008", name:"Arjun Deshpande", title:"Senior Software Engineer", department:"Engineering", managerId:"SAR-007", location:"Hyderabad", status:"Active" },
+    { id:"SAR-009", name:"Lena Fischer", title:"Software Engineer", department:"Engineering", managerId:"SAR-007", location:"Berlin", status:"On leave" },
+    { id:"SAR-010", name:"Kwame Mensah", title:"Software Engineer", department:"Engineering", managerId:"SAR-007", location:"Accra", status:"Active" },
+    { id:"SAR-011", name:"Sana Qureshi", title:"QA Lead", department:"Quality", managerId:"SAR-006", location:"Pune", status:"Active" },
+    { id:"SAR-012", name:"Tarun Bhat", title:"QA Engineer", department:"Quality", managerId:"SAR-011", location:"Pune", status:"Active" },
+    { id:"SAR-013", name:"Priya Varma", title:"Product Manager", department:"Product", managerId:"SAR-003", location:"Pune", status:"Active" },
+    { id:"SAR-014", name:"Ethan Brooks", title:"Product Manager", department:"Product", managerId:"SAR-003", location:"New York", status:"Active" },
+    { id:"SAR-015", name:"Ananya Ghosh", title:"Product Designer", department:"Design", managerId:"SAR-005", location:"Kolkata", status:"Active" },
+    { id:"SAR-016", name:"Marco Bianchi", title:"Product Designer", department:"Design", managerId:"SAR-005", location:"Milan", status:"Active" },
+    { id:"SAR-017", name:"Deepa Pillai", title:"Data Science Lead", department:"Data", managerId:"SAR-002", location:"Bengaluru", status:"Active" },
+    { id:"SAR-018", name:"Yusuf Khan", title:"Data Analyst", department:"Data", managerId:"SAR-017", location:"Hyderabad", status:"Active" },
+    { id:"SAR-019", name:"Grace Miller", title:"Head of People", department:"People", managerId:"SAR-001", location:"London", status:"Active" },
+    { id:"SAR-020", name:"Karthik Reddy", title:"People Partner", department:"People", managerId:"SAR-019", location:"Bengaluru", status:"Active" },
+    { id:"SAR-021", name:"Sofia Alvarez", title:"Account Executive", department:"Revenue", managerId:"SAR-004", location:"Madrid", status:"Active" },
+    { id:"SAR-022", name:"Ravi Chauhan", title:"Sales Development Rep", department:"Revenue", managerId:"SAR-004", location:"Mumbai", status:"Active" },
+    { id:"SAR-023", name:"Hannah Cohen", title:"Marketing Manager", department:"Revenue", managerId:"SAR-004", location:"London", status:"On leave" },
+    { id:"SAR-024", name:"Neel Joshi", title:"Finance Manager", department:"Finance", managerId:"SAR-001", location:"Mumbai", status:"Active" },
+    { id:"SAR-025", name:"Ishita Sen", title:"Financial Analyst", department:"Finance", managerId:"SAR-024", location:"Mumbai", status:"Active" },
+    { id:"SAR-026", name:"Omar Haddad", title:"Site Reliability Engineer", department:"Engineering", managerId:"SAR-007", location:"Dubai", status:"Active" }
+  ];
+
+  const DEPT_COLOR = {
+    Executive: "150 120 40",
+    Engineering: "12 110 99",
+    Product: "67 80 170",
+    Design: "190 70 110",
+    Revenue: "176 120 20",
+    Data: "20 120 160",
+    Quality: "40 140 90",
+    People: "200 90 70",
+    Finance: "70 100 150"
+  };
+
+  const byId = Object.fromEntries(EMPLOYEES.map(e => [e.id, e]));
+  const initials = n => n.split(" ").map(w => w[0]).slice(0,2).join("").toUpperCase();
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+  // Stats
+  const stats = [
+    ["Total people", EMPLOYEES.length],
+    ["Departments", new Set(EMPLOYEES.map(e => e.department)).size],
+    ["Locations", new Set(EMPLOYEES.map(e => e.location)).size],
+    ["On leave", EMPLOYEES.filter(e => e.status === "On leave").length]
+  ];
+  document.getElementById("stats").innerHTML = stats.map(([l,k]) =>
+    `<div class="stat"><div class="k">${k}</div><div class="l">${l}</div></div>`).join("");
+
+  // Filters
+  const depts = ["All", ...Array.from(new Set(EMPLOYEES.map(e => e.department))).sort()];
+  let activeDept = "All", query = "";
+  const filtersEl = document.getElementById("filters");
+  filtersEl.innerHTML = depts.map((d,i) =>
+    `<button class="chip" role="button" aria-pressed="${i===0}" data-d="${esc(d)}">${esc(d)}</button>`).join("");
+
+  const pinSvg = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.6 7-11a7 7 0 10-14 0c0 5.4 7 11 7 11z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="2.4" stroke="currentColor" stroke-width="1.8"/></svg>';
+  const upSvg = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 19V6M6 11l6-6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function cardHTML(e) {
+    const c = DEPT_COLOR[e.department] || "90 105 120";
+    const mgr = e.managerId ? byId[e.managerId]?.name : "Board of Directors";
+    const st = e.status === "Active" ? "active" : "leave";
+    return `<article class="card" style="--c:${c}">
+      <div class="card-top">
+        <div class="av" aria-hidden="true">${initials(e.name)}</div>
+        <div class="who2">
+          <div class="nm">${esc(e.name)}</div>
+          <div class="tt">${esc(e.title)}</div>
+        </div>
+      </div>
+      <div class="row">
+        <span class="dept">${esc(e.department)}</span>
+        <span class="pill ${st}"><i></i>${esc(e.status)}</span>
+      </div>
+      <div class="meta">
+        <div>${pinSvg}<span>${esc(e.location)}</span><span class="id">${esc(e.id)}</span></div>
+        <div>${upSvg}<span>Reports to ${esc(mgr)}</span></div>
+      </div>
+    </article>`;
+  }
+
+  const gridEl = document.getElementById("grid");
+  function render() {
+    const q = query.trim().toLowerCase();
+    const list = EMPLOYEES.filter(e => {
+      const okDept = activeDept === "All" || e.department === activeDept;
+      const okQ = !q || [e.name, e.title, e.location, e.department].some(v => v.toLowerCase().includes(q));
+      return okDept && okQ;
+    });
+    gridEl.innerHTML = list.length
+      ? list.map(cardHTML).join("")
+      : `<div class="empty">No one matches that search yet.</div>`;
+    // gentle stagger
+    [...gridEl.querySelectorAll(".card")].forEach((el,i) => el.style.animationDelay = (i*28)+"ms");
+  }
+  render();
+
+  filtersEl.addEventListener("click", ev => {
+    const b = ev.target.closest(".chip"); if (!b) return;
+    activeDept = b.dataset.d;
+    filtersEl.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", c === b));
+    render();
+  });
+  document.getElementById("q").addEventListener("input", e => { query = e.target.value; render(); });
+
+  document.getElementById("theme").addEventListener("click", () => {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const next = cur === "dark" ? "light" : cur === "light" ? "dark"
+      : (matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "dark");
+    document.documentElement.setAttribute("data-theme", next);
+  });
+</script>
+</body>
+</html>

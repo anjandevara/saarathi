@@ -1,0 +1,69 @@
+# GitHub Actions pipeline.
+# Every CI file in this project (GitHub Actions, Jenkins, Bitbucket) does the
+# exact same 4 steps: install deps, install browsers, run tests, upload reports.
+# That is on purpose — the framework itself does not care which CI runs it.
+name: Playwright Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Which environment to run against'
+        required: true
+        default: 'qa'
+        type: choice
+        options: [dev, qa, prod]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run tests
+        env:
+          TEST_ENV: ${{ inputs.environment || 'qa' }}
+        run: npx playwright test
+
+      - name: Generate Allure report
+        # Needs a real Java install — GitHub's ubuntu-latest runners ship
+        # one by default, so no extra install step is needed here. (Our
+        # Bitbucket pipeline file has to install Java itself, because the
+        # Playwright docker image it uses does not include one.)
+        if: always()
+        run: npm run report:allure:generate
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-html-report
+          path: reports/html-report
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-report
+          path: reports/allure-report
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-logs
+          path: reports/logs
+          retention-days: 30

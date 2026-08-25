@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<!--
+  This page is the framework's own practice ground.
+
+  It is written the way a LOT of real apps are written: some fields have
+  no id, no name, and no proper <label>. That is on purpose. Every section
+  below has a comment saying which locator strategy the framework is
+  expected to use to find it, so you can see the resilient-locator logic
+  actually being proven, not just described.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Framework Demo Page</title>
+  <style>
+    body { font-family: sans-serif; max-width: 640px; margin: 40px auto; }
+    section { margin-bottom: 28px; padding-bottom: 16px; border-bottom: 1px solid #ddd; }
+    h2 { font-size: 16px; color: #333; }
+    dialog { padding: 20px; }
+    [role="tab"] { padding: 6px 12px; cursor: pointer; border: 1px solid #ccc; display: inline-block; }
+    [role="tab"][aria-selected="true"] { background: #333; color: #fff; }
+    [role="tabpanel"] { border: 1px solid #ccc; padding: 10px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+  <section>
+    <h2>1. Textbox with no label at all, expect: placeholder strategy</h2>
+    <input type="text" placeholder="Username" />
+  </section>
+
+  <section>
+    <h2>2. Textbox with no id, but wrapped in a real &lt;label&gt;, expect: label strategy</h2>
+    <label>Password <input type="password" /></label>
+  </section>
+
+  <section>
+    <h2>3. Checkbox with only an aria-label, expect: role + name strategy</h2>
+    <input type="checkbox" aria-label="Accept terms and conditions" />
+  </section>
+
+  <section>
+    <h2>4. Checkbox with nothing at all (not even aria-label), expect: css fallback</h2>
+    <input type="checkbox" class="js-newsletter-opt-in" />
+    <span>Subscribe to newsletter (this text is NOT linked to the checkbox on purpose)</span>
+  </section>
+
+  <section>
+    <h2>5. Radio buttons wrapped in labels, expect: role + name strategy</h2>
+    <label><input type="radio" name="plan" value="basic" /> Basic</label>
+    <label><input type="radio" name="plan" value="pro" /> Pro</label>
+    <label><input type="radio" name="plan" value="enterprise" /> Enterprise</label>
+  </section>
+
+  <section>
+    <h2>6. Dropdown with no id, no name, no label, expect: role strategy (unique by role)</h2>
+    <span>Country</span>
+    <select>
+      <option value="">Select a country</option>
+      <option value="in">India</option>
+      <option value="us">United States</option>
+      <option value="uk">United Kingdom</option>
+    </select>
+  </section>
+
+  <section>
+    <h2>7. Slider with only an aria-label, expect: role + name strategy</h2>
+    <input type="range" min="0" max="100" value="50" aria-label="Volume" />
+  </section>
+
+  <section>
+    <h2>8. Toggle switch built from a checkbox, expect: role=switch + name strategy</h2>
+    <input type="checkbox" role="switch" aria-label="Dark mode" />
+  </section>
+
+  <section>
+    <h2>9. Date picker with no label, expect: data-testid (best practice when you control the code)</h2>
+    <input type="date" data-testid="birth-date" />
+  </section>
+
+  <section>
+    <h2>10. File upload, wrapped in a label, expect: label strategy</h2>
+    <label>Upload resume <input type="file" /></label>
+  </section>
+
+  <section>
+    <h2>11. Data table, expect: role=table strategy</h2>
+    <table>
+      <caption>Recent orders</caption>
+      <thead>
+        <tr><th>Order ID</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>ORD-1001</td><td>Shipped</td></tr>
+        <tr><td>ORD-1002</td><td>Processing</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>12. Tabs (custom-built, ARIA-based), expect: role=tab + name strategy</h2>
+    <div role="tablist" aria-label="Demo tabs">
+      <div role="tab" id="tab-details" aria-selected="true" aria-controls="panel-details">Details</div>
+      <div role="tab" id="tab-shipping" aria-selected="false" aria-controls="panel-shipping">Shipping</div>
+    </div>
+    <div role="tabpanel" id="panel-details">Product details go here.</div>
+    <div role="tabpanel" id="panel-shipping" hidden>Shipping info goes here.</div>
+  </section>
+
+  <section>
+    <h2>13. Modal dialog, expect: role=dialog strategy</h2>
+    <button id="open-terms-btn">View Terms &amp; Conditions</button>
+    <dialog id="terms-dialog">
+      <p>These are the terms and conditions.</p>
+      <button id="close-terms-btn">Close</button>
+    </dialog>
+  </section>
+
+  <section>
+    <h2>14. Button that does not exist yet on page load, appears 1200ms late,
+    proves the resolver really waits instead of checking once and giving up</h2>
+    <div id="late-button-container"></div>
+  </section>
+
+  <script>
+    // This button is added to the page well after load, on purpose, to prove
+    // the resolver's wait is real. A resolver that only checks once at the
+    // moment it is called would report zero matches and never find it.
+    setTimeout(() => {
+      const lateButton = document.createElement('button');
+      lateButton.setAttribute('aria-label', 'Late Arriving Button');
+      lateButton.textContent = 'Click me';
+      document.getElementById('late-button-container').appendChild(lateButton);
+    }, 1200);
+  </script>
+
+  <script>
+    // Just enough JS to make the tabs and modal actually work in a browser.
+    const openBtn = document.getElementById('open-terms-btn');
+    const closeBtn = document.getElementById('close-terms-btn');
+    const dialog = document.getElementById('terms-dialog');
+    openBtn.addEventListener('click', () => dialog.showModal());
+    closeBtn.addEventListener('click', () => dialog.close());
+
+    const tabs = document.querySelectorAll('[role="tab"]');
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        tabs.forEach((t) => t.setAttribute('aria-selected', 'false'));
+        tab.setAttribute('aria-selected', 'true');
+        document.getElementById('panel-details').hidden = tab.id !== 'tab-details';
+        document.getElementById('panel-shipping').hidden = tab.id !== 'tab-shipping';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+This folder is where tests can save information captured from the app
+(for example: an order ID created during a test, so a later test or a
+later run can reuse it). Save it as JSON. Nothing else goes in here.

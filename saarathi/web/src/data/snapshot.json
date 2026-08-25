@@ -1,0 +1,26 @@
+{
+  "project": { "id": "playwright-framework", "name": "Playwright Framework", "path": "", "env": "local" },
+  "run": { "number": 1, "total": 8, "passed": 8, "failed": 0, "flaky": 0, "health": 100, "at": "2026-08-25T09:00:00.000Z" },
+  "agents": [
+    { "key": "spec-writer", "name": "Spec-writer", "persona": "The Planner", "description": "Turns a feature, bug, or resolved doubt into a Given/When/Then test plan.", "state": "idle", "statusLabel": "idle" },
+    { "key": "test-implementer", "name": "Test-implementer", "persona": "The Builder", "description": "Takes the plan and writes the actual Playwright spec and Page Object code.", "state": "idle", "statusLabel": "idle" },
+    { "key": "code-reviewer", "name": "Code-reviewer", "persona": "The Critic", "description": "Checks new tests against the house style rules; fixes the mechanical, escalates the rest.", "state": "idle", "statusLabel": "idle" },
+    { "key": "triage", "name": "Triage", "persona": "The Diagnostician", "description": "Reads a failed test and classifies it: brittleness, real bug, recommendation, or doubt.", "state": "idle", "statusLabel": "idle" },
+    { "key": "self-healer", "name": "Self-healer", "persona": "The Mender", "description": "Repairs a broken locator, only within the defined fallback chain, never a guess.", "state": "idle", "statusLabel": "idle" },
+    { "key": "documentation-keeper", "name": "Doc-keeper", "persona": "The Scribe", "description": "The only agent that writes to the bugs, doubts, recommendations, and lessons records.", "state": "idle", "statusLabel": "idle" }
+  ],
+  "signals": [
+    { "kind": "lesson", "title": "findElement() checked once instead of really waiting", "status": "captured" },
+    { "kind": "lesson", "title": ".gitignore said never commit credentials but did not actually exclude .env", "status": "captured" },
+    { "kind": "lesson", "title": "Style rules existed only as prose, never as something a machine checked", "status": "captured" },
+    { "kind": "lesson", "title": "The em dash check itself had a blind spot: README.md and demo-app/index.html", "status": "captured" }
+  ],
+  "counts": { "bugs": 0, "doubts": 0, "recommendations": 0, "lessons": 4 },
+  "activity": [
+    "Suite health 100 percent, 8 of 8 passing",
+    "Lesson captured: findElement() checked once instead of really waiting",
+    "Lesson captured: style rules existed only as prose, never machine checked",
+    "Guardrail script now enforces 8 checks across the codebase"
+  ],
+  "live": false
+}

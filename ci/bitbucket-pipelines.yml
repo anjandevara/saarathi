@@ -1,0 +1,55 @@
+# Bitbucket Pipelines.
+# Same 4 steps as the GitHub Actions workflow and the Jenkinsfile: install
+# deps, install browsers, run tests, publish reports. Not officially
+# documented by the Playwright team, so this follows the general
+# "npx playwright test in CI" guidance rather than a Bitbucket-specific page.
+#
+# To use this file, copy or symlink it to bitbucket-pipelines.yml at the
+# root of the repository (Bitbucket requires it there, not in a subfolder).
+#
+# IMPORTANT: this tag must exactly match the @playwright/test version in
+# package.json, or the browser inside the image won't match the test code
+# and tests will fail to launch a browser at all. Confirmed against the
+# real playwright.dev/docs/docker page. One honest warning: Microsoft has,
+# in the past, been late publishing the image for a brand-new patch version
+# (see github.com/microsoft/playwright/issues/41987 for a real example).
+# If this exact tag 404s, check https://mcr.microsoft.com/en-us/product/playwright/tags
+# and temporarily pin to the newest tag that does exist, then bump both
+# package.json and this file together once the matching image is published.
+image: mcr.microsoft.com/playwright:v1.62.1-jammy
+
+pipelines:
+  default:
+    - step:
+        name: Run Playwright tests (QA)
+        script:
+          - npm ci
+          - export TEST_ENV=qa
+          - npx playwright test
+        after-script:
+          # The Allure report generator needs a real Java install and the
+          # Playwright docker image does not include one. Confirmed by
+          # actually running "npm run report:allure:generate" without Java
+          # present — it fails. Installing it here keeps this pipeline
+          # working out of the box.
+          - apt-get update -qq && apt-get install -y -qq default-jre-headless
+          - npm run report:allure:generate
+        artifacts:
+          - reports/html-report/**
+          - reports/allure-report/**
+          - reports/logs/**
+          - reports/junit-results.xml
+
+  custom:
+    run-against-dev:
+      - step:
+          name: Run Playwright tests (Dev)
+          script:
+            - npm ci
+            - export TEST_ENV=dev
+            - npx playwright test
+          after-script:
+            - npm run report:allure:generate
+          artifacts:
+            - reports/html-report/**
+            - reports/allure-report/**

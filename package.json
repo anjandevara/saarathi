@@ -1,0 +1,35 @@
+{
+  "name": "playwright-framework",
+  "version": "1.0.0",
+  "description": "Beginner-friendly Playwright + TypeScript E2E automation starter framework.",
+  "private": true,
+  "scripts": {
+    "test": "cross-env TEST_ENV=local playwright test",
+    "test:local": "cross-env TEST_ENV=local playwright test",
+    "test:dev": "cross-env TEST_ENV=dev playwright test",
+    "test:qa": "cross-env TEST_ENV=qa playwright test",
+    "test:prod": "cross-env TEST_ENV=prod playwright test",
+    "test:headed": "cross-env TEST_ENV=local playwright test --headed",
+    "test:smoke": "cross-env TEST_ENV=local playwright test --grep @smoke",
+    "test:regression": "cross-env TEST_ENV=local playwright test --grep @regression",
+    "typecheck": "tsc --noEmit",
+    "check:guardrails": "node scripts/check-guardrails.js .",
+    "report:html:open": "playwright show-report reports/html-report",
+    "report:allure:generate": "allure generate reports/allure-results --output reports/allure-report --clean",
+    "report:allure:open": "allure open reports/allure-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@aws-sdk/client-s3": "^3.1116.0",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.2.0",
+    "allure-commandline": "^2.43.0",
+    "allure-js-commons": "^3.10.2",
+    "allure-playwright": "^3.10.2",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.4.2",
+    "typescript": "^7.0.2"
+  }
+}

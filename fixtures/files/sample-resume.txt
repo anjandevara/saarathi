@@ -1,0 +1,3 @@
+This is a small, synthetic fixture file used only to prove the file upload
+component action works. It is not a real resume and contains no real
+personal information, per the framework's data privacy guardrail.

@@ -1,0 +1,10 @@
+{
+  "standardUser": {
+    "username": "standard_user",
+    "password": "Sup3rSecret!"
+  },
+  "adminUser": {
+    "username": "admin_user",
+    "password": "Adm1nOnly!"
+  }
+}

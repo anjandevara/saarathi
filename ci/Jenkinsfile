@@ -1,0 +1,52 @@
+// Jenkins pipeline.
+// Same 4 steps as the GitHub Actions workflow: install deps, install
+// browsers, run tests, publish reports. Jenkins is not officially
+// documented by the Playwright team, so this was written and tested
+// against the general "npx playwright test in CI" guidance, not a
+// Jenkins-specific Playwright doc page.
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'TEST_ENV', choices: ['dev', 'qa', 'prod'], description: 'Environment to run tests against')
+    }
+
+    stages {
+        stage('Install dependencies') {
+            steps {
+                sh 'npm ci'
+            }
+        }
+
+        stage('Install Playwright browsers') {
+            steps {
+                sh 'npx playwright install --with-deps chromium'
+            }
+        }
+
+        stage('Run tests') {
+            steps {
+                // catchError lets the pipeline keep going into the post{}
+                // block below even when tests fail, so the report always
+                // gets generated and published, pass or fail.
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                    sh "TEST_ENV=${params.TEST_ENV} npx playwright test"
+                }
+            }
+        }
+    }
+
+    post {
+        // This runs no matter what happened above, which is the whole
+        // point: the report has to exist even when tests failed.
+        always {
+            // Allure's report generator needs a real Java install. Most
+            // Jenkins agent images already have one (Jenkins itself needs
+            // Java to run), but if yours doesn't, install a JRE before
+            // this line, the same way the Bitbucket pipeline file does.
+            sh 'npm run report:allure:generate'
+            archiveArtifacts artifacts: 'reports/html-report/**, reports/allure-report/**, reports/logs/**, reports/junit-results.xml', allowEmptyArchive: true
+            junit testResults: 'reports/junit-results.xml', allowEmptyResults: true
+        }
+    }
+}

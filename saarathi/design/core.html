@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Saarathi Command Core</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap" />
+<style>
+  :root{
+    --bg:#05080c;
+    --bg2:#070c12;
+    --ink:#e6f2ef;
+    --soft:#a9c4bf;
+    --muted:#6d8a85;
+    --faint:#496862;
+    --teal:#33e2c6;
+    --teal-dim:#1aa792;
+    --teal-deep:#0c6e63;
+    --amber:#e6b45c;
+    --red:#ff6b6b;
+    --line:rgba(120,220,205,.16);
+    --line-strong:rgba(120,220,205,.30);
+    --panel:rgba(10,20,24,.42);
+    --panel-2:rgba(8,16,20,.6);
+    --glow:0 0 24px rgba(51,226,198,.22);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Manrope",system-ui,sans-serif;
+    overflow:hidden; -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:"JetBrains Mono",monospace;}
+  .hud{font-family:"Chakra Petch",sans-serif;}
+  .lbl{font-family:"Chakra Petch",sans-serif; text-transform:uppercase; letter-spacing:.24em; font-size:10.5px; font-weight:600; color:var(--muted);}
+
+  .stage{position:fixed; inset:0; overflow:hidden;}
+  /* atmosphere */
+  .atmo{position:absolute; inset:0; z-index:0;
+    background:
+      radial-gradient(60rem 60rem at 50% 52%, rgba(20,110,99,.18), transparent 60%),
+      radial-gradient(40rem 30rem at 84% 12%, rgba(28,90,130,.14), transparent 60%),
+      radial-gradient(46rem 40rem at 10% 96%, rgba(12,70,63,.16), transparent 62%),
+      linear-gradient(180deg,var(--bg),var(--bg2));
+  }
+  .gridlines{position:absolute; inset:0; z-index:0; opacity:.5;
+    background-image:linear-gradient(rgba(90,200,185,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(90,200,185,.05) 1px,transparent 1px);
+    background-size:64px 64px; mask-image:radial-gradient(70% 70% at 50% 50%,#000,transparent 88%);}
+  .vign{position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:radial-gradient(120% 120% at 50% 45%, transparent 55%, rgba(0,0,0,.6));}
+  /* blurred decorative depth glyphs */
+  .depth{position:absolute; z-index:0; color:var(--teal); opacity:.10; filter:blur(3px); font-family:"Chakra Petch"; }
+
+  /* corner framing */
+  .frame{position:absolute; inset:20px; z-index:3; pointer-events:none;}
+  .corner{position:absolute; width:46px; height:46px; border:1px solid var(--line-strong);}
+  .corner.tl{top:0;left:0;border-right:0;border-bottom:0;}
+  .corner.tr{top:0;right:0;border-left:0;border-bottom:0;}
+  .corner.bl{bottom:0;left:0;border-right:0;border-top:0;}
+  .corner.br{bottom:0;right:0;border-left:0;border-top:0;}
+  .tick-h{position:absolute; top:0; left:50%; transform:translateX(-50%); width:2px; height:12px; background:var(--line-strong);}
+  .tick-b{position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:2px; height:12px; background:var(--line-strong);}
+
+  /* top bar */
+  .topbar{position:absolute; z-index:5; top:40px; left:52px; right:52px; display:flex; align-items:center; gap:18px;}
+  .brand{display:flex; align-items:center; gap:13px;}
+  .brand .mk{width:34px;height:34px;position:relative;}
+  .brand .mk svg{width:34px;height:34px; filter:drop-shadow(0 0 8px rgba(51,226,198,.5));}
+  .brand .nm{font-family:"Chakra Petch"; font-weight:700; font-size:19px; letter-spacing:.34em; padding-left:.2em;}
+  .brand .sub{color:var(--teal); }
+  .sep{width:1px; height:26px; background:var(--line);}
+  .proj{display:flex; align-items:center; gap:9px; padding:7px 13px; border:1px solid var(--line); background:var(--panel); border-radius:3px;}
+  .proj .dot{width:6px;height:6px;border-radius:50%;background:var(--teal); box-shadow:0 0 10px var(--teal);}
+  .proj .mono{font-size:12.5px; color:var(--soft);}
+  .status-r{margin-left:auto; display:flex; align-items:center; gap:22px;}
+  .nominal{display:flex; align-items:center; gap:9px;}
+  .nominal .d{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 12px var(--teal); animation:blip 2.4s infinite;}
+  .readout{font-family:"JetBrains Mono"; font-size:12px; color:var(--muted); letter-spacing:.02em;}
+  .readout b{color:var(--soft); font-weight:500;}
+
+  /* center core */
+  .core-wrap{position:absolute; z-index:2; inset:0; display:grid; place-items:center;}
+  #core{ filter:drop-shadow(0 0 30px rgba(51,226,198,.14)); }
+  .core-center{position:absolute; z-index:2; display:grid; place-items:center; text-align:center; pointer-events:none;}
+  .core-center .big{font-family:"Chakra Petch"; font-weight:700; font-size:52px; line-height:1; color:var(--ink); text-shadow:0 0 24px rgba(51,226,198,.4); font-variant-numeric:tabular-nums;}
+  .core-center .big span{color:var(--teal);}
+  .core-center .cap{margin-top:8px;}
+  .core-center .cap .lbl{color:var(--soft);}
+  .core-center .sub2{margin-top:3px; font-family:"JetBrains Mono"; font-size:11.5px; color:var(--muted);}
+
+  /* side panels */
+  .panel{position:absolute; z-index:5; width:296px; background:var(--panel-2);
+    border:1px solid var(--line); border-radius:2px;
+    box-shadow:var(--glow), inset 0 0 0 1px rgba(255,255,255,.015);
+    backdrop-filter:blur(6px);
+    clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  }
+  .panel .head{display:flex; align-items:center; justify-content:space-between; padding:13px 16px; border-bottom:1px solid var(--line);}
+  .panel .head .lbl{color:var(--soft);}
+  .panel .head .n{font-family:"JetBrains Mono"; font-size:11px; color:var(--teal);}
+  .panel .body{padding:14px 16px;}
+  .left{left:52px; top:148px;}
+  .right{right:52px; top:148px;}
+
+  /* status panel */
+  .metric{display:flex; align-items:baseline; gap:10px; margin-bottom:14px;}
+  .metric .v{font-family:"Chakra Petch"; font-weight:700; font-size:30px; line-height:1; font-variant-numeric:tabular-nums;}
+  .metric .u{font-family:"JetBrains Mono"; font-size:11px; color:var(--muted);}
+  .bars{display:flex; flex-direction:column; gap:11px;}
+  .bar{}
+  .bar .t{display:flex; justify-content:space-between; font-family:"JetBrains Mono"; font-size:11.5px; margin-bottom:5px;}
+  .bar .t .k{color:var(--soft);}
+  .bar .t .val{color:var(--muted);}
+  .track{height:5px; background:rgba(120,220,205,.08); border-radius:2px; overflow:hidden;}
+  .fill{height:100%; border-radius:2px;}
+  .fill.pass{background:linear-gradient(90deg,var(--teal-dim),var(--teal)); box-shadow:0 0 10px rgba(51,226,198,.5);}
+  .fill.fail{background:linear-gradient(90deg,#a23b3b,var(--red)); box-shadow:0 0 10px rgba(255,107,107,.4);}
+  .fill.flaky{background:linear-gradient(90deg,#9a7433,var(--amber)); box-shadow:0 0 10px rgba(230,180,92,.4);}
+
+  /* agents panel */
+  .agent{display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1px solid rgba(120,220,205,.07);}
+  .agent:last-child{border-bottom:0;}
+  .agent .d{width:7px;height:7px;border-radius:50%;flex:0 0 auto;}
+  .agent .d.on{background:var(--teal); box-shadow:0 0 9px var(--teal);}
+  .agent .d.idle{background:var(--faint);}
+  .agent .d.work{background:#5db6ff; box-shadow:0 0 9px #5db6ff; animation:blip 1.6s infinite;}
+  .agent .d.wait{background:var(--amber); box-shadow:0 0 9px var(--amber); animation:blip 1.2s infinite;}
+  .agent .nm{font-size:13.5px; font-weight:600; color:var(--ink);}
+  .agent .st{margin-left:auto; font-family:"JetBrains Mono"; font-size:10.5px; letter-spacing:.03em; text-transform:uppercase;}
+  .agent .st.idle{color:var(--faint);} .agent .st.on{color:var(--teal);} .agent .st.work{color:#5db6ff;} .agent .st.wait{color:var(--amber);}
+
+  /* bottom ticker */
+  .dock{position:absolute; z-index:5; left:52px; right:52px; bottom:40px; display:flex; align-items:stretch; gap:14px;}
+  .ticker{flex:1; display:flex; align-items:center; gap:16px; padding:13px 18px; background:var(--panel-2); border:1px solid var(--line); border-radius:2px; overflow:hidden;
+    clip-path:polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);}
+  .ticker .lbl{color:var(--teal); flex:0 0 auto;}
+  .ticker .stream{font-family:"JetBrains Mono"; font-size:12px; color:var(--soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .ticker .stream b{color:var(--amber); font-weight:500;}
+  .counts{display:flex; gap:10px; flex:0 0 auto;}
+  .count{min-width:88px; padding:11px 15px; background:var(--panel-2); border:1px solid var(--line); border-radius:2px; text-align:center;
+    clip-path:polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));}
+  .count .v{font-family:"Chakra Petch"; font-weight:700; font-size:22px; line-height:1; font-variant-numeric:tabular-nums;}
+  .count .v.warn{color:var(--amber);} .count .v.teal{color:var(--teal);}
+  .count .l{margin-top:5px; font-family:"Chakra Petch"; text-transform:uppercase; letter-spacing:.14em; font-size:9px; color:var(--muted);}
+
+  @keyframes blip{0%,100%{opacity:1;}50%{opacity:.35;}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;}}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="atmo"></div>
+  <div class="gridlines"></div>
+  <div class="depth hud" style="left:18%;top:26%;font-size:120px;font-weight:700;">SAR</div>
+  <div class="depth hud" style="right:14%;bottom:20%;font-size:90px;font-weight:700;">08</div>
+  <div class="depth mono" style="left:44%;top:14%;font-size:40px;">// EXEC</div>
+  <div class="vign"></div>
+
+  <div class="frame">
+    <span class="corner tl"></span><span class="corner tr"></span>
+    <span class="corner bl"></span><span class="corner br"></span>
+    <span class="tick-h"></span><span class="tick-b"></span>
+  </div>
+
+  <!-- top bar -->
+  <div class="topbar">
+    <div class="brand">
+      <span class="mk" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 18c3.5 0 3.5-12 7-12s3.5 12 7 12" stroke="#33e2c6" stroke-width="2" stroke-linecap="round"/><circle cx="19.6" cy="18" r="1.7" fill="#33e2c6"/></svg>
+      </span>
+      <span class="nm">SAARATHI</span>
+    </div>
+    <span class="sep"></span>
+    <span class="lbl" style="color:var(--faint)">Command</span>
+    <div class="proj">
+      <span class="dot"></span>
+      <span class="mono">playwright-framework</span>
+      <span class="mono" style="color:var(--faint)">&#9662;</span>
+    </div>
+    <div class="status-r">
+      <span class="nominal"><span class="d"></span><span class="lbl" style="color:var(--teal)">All systems nominal</span></span>
+      <span class="readout">ENV <b>local</b> &nbsp; NODE <b>3</b> &nbsp; <b id="clock">--:--:--</b></span>
+    </div>
+  </div>
+
+  <!-- center core -->
+  <div class="core-wrap"><canvas id="core" width="1120" height="1120" style="width:560px;height:560px;"></canvas></div>
+  <div class="core-wrap">
+    <div class="core-center">
+      <div class="big">92<span>%</span></div>
+      <div class="cap"><span class="lbl">Suite health</span></div>
+      <div class="sub2">last run &middot; 26 tests &middot; 92s ago</div>
+    </div>
+  </div>
+
+  <!-- left: system status -->
+  <aside class="panel left">
+    <div class="head"><span class="lbl">System Status</span><span class="n">RUN 148</span></div>
+    <div class="body">
+      <div class="metric"><span class="v" style="color:var(--teal)">24</span><span class="u">/ 26 passed</span></div>
+      <div class="bars">
+        <div class="bar"><div class="t"><span class="k">Passed</span><span class="val">24</span></div><div class="track"><div class="fill pass" style="width:92%"></div></div></div>
+        <div class="bar"><div class="t"><span class="k">Failed</span><span class="val">1</span></div><div class="track"><div class="fill fail" style="width:8%"></div></div></div>
+        <div class="bar"><div class="t"><span class="k">Flaky</span><span class="val">1</span></div><div class="track"><div class="fill flaky" style="width:8%"></div></div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- right: agents -->
+  <aside class="panel right">
+    <div class="head"><span class="lbl">Agents</span><span class="n">6 ONLINE</span></div>
+    <div class="body" style="padding-top:6px;padding-bottom:6px;">
+      <div class="agent"><span class="d idle"></span><span class="nm">Spec-writer</span><span class="st idle">idle</span></div>
+      <div class="agent"><span class="d idle"></span><span class="nm">Test-implementer</span><span class="st idle">idle</span></div>
+      <div class="agent"><span class="d idle"></span><span class="nm">Code-reviewer</span><span class="st idle">idle</span></div>
+      <div class="agent"><span class="d work"></span><span class="nm">Triage</span><span class="st work">analysing</span></div>
+      <div class="agent"><span class="d wait"></span><span class="nm">Self-healer</span><span class="st wait">approval</span></div>
+      <div class="agent"><span class="d idle"></span><span class="nm">Doc-keeper</span><span class="st idle">idle</span></div>
+    </div>
+  </aside>
+
+  <!-- bottom dock -->
+  <div class="dock">
+    <div class="ticker">
+      <span class="lbl">Activity</span>
+      <span class="stream">Triage classified SAR-009 failure as test brittleness, high confidence &nbsp;&middot;&nbsp; <b>Self-healer proposes a locator fix, awaiting your approval</b> &nbsp;&middot;&nbsp; Doc-keeper logged 1 doubt</span>
+    </div>
+    <div class="counts">
+      <div class="count"><div class="v warn">2</div><div class="l">Bugs open</div></div>
+      <div class="count"><div class="v warn">1</div><div class="l">Doubts</div></div>
+      <div class="count"><div class="v teal">3</div><div class="l">Recs</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const cv = document.getElementById('core');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height, cx = W/2, cy = H/2;
+  const TEAL = '51,226,198';
+  const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  function ring(r, w, a, dash){
+    ctx.beginPath();
+    if(dash) ctx.setLineDash(dash); else ctx.setLineDash([]);
+    ctx.arc(0,0,r,0,Math.PI*2);
+    ctx.lineWidth = w; ctx.strokeStyle = `rgba(${TEAL},${a})`;
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+  function arc(r,w,a,start,len,glow){
+    ctx.beginPath(); ctx.arc(0,0,r,start,start+len);
+    ctx.lineWidth=w; ctx.lineCap='round'; ctx.strokeStyle=`rgba(${TEAL},${a})`;
+    if(glow){ctx.shadowBlur=18;ctx.shadowColor=`rgba(${TEAL},.9)`;}
+    ctx.stroke(); ctx.shadowBlur=0; ctx.lineCap='butt';
+  }
+  function ticks(r, len, count, a){
+    for(let i=0;i<count;i++){
+      const ang=(i/count)*Math.PI*2;
+      const big = i%5===0;
+      const l = big?len*1.9:len;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(ang)*r, Math.sin(ang)*r);
+      ctx.lineTo(Math.cos(ang)*(r+l), Math.sin(ang)*(r+l));
+      ctx.lineWidth = big?2:1; ctx.strokeStyle=`rgba(${TEAL},${big?a*1.6:a})`;
+      ctx.stroke();
+    }
+  }
+  function draw(t){
+    ctx.clearRect(0,0,W,H);
+    ctx.save(); ctx.translate(cx,cy);
+
+    // faint outer
+    ring(500,1,.10);
+    ring(470,1,.16);
+    // tick ring
+    ctx.save(); ctx.rotate(t*0.04); ticks(392,10,72,.28); ctx.restore();
+    // rotating segmented ring
+    ctx.save(); ctx.rotate(-t*0.10);
+    for(let i=0;i<12;i++){ arc(430,2,.30, i*(Math.PI/6)+0.06, Math.PI/6-0.32, false); }
+    ctx.restore();
+    // progress arc (92%)
+    ctx.save(); ctx.rotate(-Math.PI/2);
+    ring(348,4,.08);
+    arc(348,4,.95, 0, Math.PI*2*0.92, true);
+    ctx.restore();
+    // inner counter-rotating dashed
+    ctx.save(); ctx.rotate(t*0.16); ring(300,1.5,.4,[3,10]); ctx.restore();
+    ctx.save(); ctx.rotate(-t*0.22);
+    for(let i=0;i<3;i++){ arc(268,2.5,.5, i*(Math.PI*2/3), Math.PI/3.4, true); }
+    ctx.restore();
+    // crosshair
+    ctx.strokeStyle=`rgba(${TEAL},.14)`; ctx.lineWidth=1;
+    for(const a of [0,Math.PI/2,Math.PI,Math.PI*1.5]){
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a)*150,Math.sin(a)*150);
+      ctx.lineTo(Math.cos(a)*250,Math.sin(a)*250);
+      ctx.stroke();
+    }
+    // cardinal node dots
+    ctx.save(); ctx.rotate(t*0.04);
+    for(let i=0;i<4;i++){ const a=i*Math.PI/2; ctx.beginPath(); ctx.arc(Math.cos(a)*392,Math.sin(a)*392,3.5,0,Math.PI*2); ctx.fillStyle=`rgba(${TEAL},.9)`; ctx.shadowBlur=12; ctx.shadowColor=`rgba(${TEAL},1)`; ctx.fill(); ctx.shadowBlur=0;} ctx.restore();
+
+    // core glow
+    const pulse = reduce?0.5:(0.5+0.5*Math.sin(t*1.6));
+    const g = ctx.createRadialGradient(0,0,0,0,0,210);
+    g.addColorStop(0,`rgba(${TEAL},${0.16+pulse*0.10})`);
+    g.addColorStop(0.5,`rgba(${TEAL},0.05)`);
+    g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,210,0,Math.PI*2); ctx.fill();
+    // core ring
+    ring(200,1.5,.5);
+    arc(200,2.5,.9, -Math.PI/2, Math.PI*1.4*pulse+0.6, true);
+
+    ctx.restore();
+  }
+
+  let start=null;
+  function loop(ts){
+    if(start===null) start=ts;
+    const t=(ts-start)/1000;
+    draw(t);
+    if(!reduce) requestAnimationFrame(loop);
+  }
+  if(reduce) draw(2.2); else requestAnimationFrame(loop);
+
+  // clock readout
+  function tick(){
+    const d=new Date();
+    const p=n=>String(n).padStart(2,'0');
+    const el=document.getElementById('clock');
+    if(el) el.textContent=`${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  }
+  tick(); if(!reduce) setInterval(tick,1000);
+</script>
+</body>
+</html>
