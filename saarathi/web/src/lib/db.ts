@@ -1,4 +1,3 @@
-import { createRequire } from "node:module";
 import fs from "node:fs";
 import path from "node:path";
 import type { ProjectMeta, RunStats } from "./types";
@@ -18,8 +17,14 @@ function getDb(): any {
   if (tried) return dbInstance;
   tried = true;
   try {
-    const req = createRequire(import.meta.url);
-    const { DatabaseSync } = req("node:sqlite");
+    // process.getBuiltinModule reaches node:sqlite at runtime without handing
+    // the bundler a module specifier to resolve. createRequire(import.meta.url)
+    // used to do this, but Turbopack cannot externalize a commonjs reference
+    // made from a URL, so the production server always failed to open the
+    // database and silently degraded to no-ops.
+    const sqlite = process.getBuiltinModule("node:sqlite") as { DatabaseSync: any } | undefined;
+    if (!sqlite) throw new Error("node:sqlite is not available on this Node version");
+    const { DatabaseSync } = sqlite;
     const dir = path.join(process.cwd(), ".saarathi");
     fs.mkdirSync(dir, { recursive: true });
     const db = new DatabaseSync(path.join(dir, "saarathi.db"));
@@ -36,7 +41,11 @@ function getDb(): any {
     );
     dbInstance = db;
     available = true;
-  } catch {
+  } catch (err) {
+    // Say why. This failure is invisible on screen apart from one small note,
+    // and a silent catch here is what let the production server run without a
+    // database for a long time without anyone noticing.
+    console.warn("Saarathi: local database unavailable, running without run history.", err);
     available = false;
     dbInstance = null;
   }
