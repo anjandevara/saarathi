@@ -30,6 +30,11 @@ save time. Do not use `fable` here; that model is for your other project.
   before writing code.
 - Keep code simple and match the style around it. No clever code.
 - One issue per commit. Do not bundle many changes into one.
+- Work on a branch. A pre-commit hook refuses a commit made on `main`. Git
+  does not share hooks by itself, so turn it on once per clone:
+
+      git config core.hooksPath .githooks
+
 - Prefer checks a tool runs (lint, hooks, tests) over rules written in prose.
 - No em-dashes or long dashes anywhere: not in code, comments, docs, or
   generated reports. Use commas, colons, or short sentences.
