@@ -345,3 +345,42 @@ a { color: inherit; text-decoration: none; }
   .report-table thead { display: table-header-group; }
   @page { margin: 16mm; }
 }
+
+/* test cases --------------------------------------------------------------- */
+.spec-card { margin-bottom: 20px; padding: 0; }
+.spec-head {
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  padding: 14px 18px; border-bottom: 1px solid var(--line);
+}
+.spec-file { font-size: 12px; color: var(--accent-ink); }
+.spec-suite { font-size: 13.5px; color: var(--soft); }
+.spec-count { margin-left: auto; font-size: 11px; color: var(--muted); }
+.spec-imports { padding: 12px 18px; border-bottom: 1px solid rgba(120, 220, 205, 0.07); }
+/* A file the parser could not read says so here, in the place the tests would
+   have been, so an unreadable spec can never look like a spec with no tests. */
+.note {
+  margin: 0; padding: 12px 18px; font-size: 13px; color: var(--warn);
+  border-bottom: 1px solid rgba(120, 220, 205, 0.07);
+}
+.none { margin: 6px 0; font-size: 12.5px; color: var(--faint); font-style: italic; }
+
+.test-row { padding: 14px 18px; border-bottom: 1px solid rgba(120, 220, 205, 0.07); }
+.test-row:last-child { border-bottom: 0; }
+.test-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.test-title { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.test-line { margin-left: auto; font-size: 10.5px; color: var(--faint); }
+
+.tag {
+  font-family: var(--font-mono); font-size: 10.5px; padding: 2px 7px;
+  border: 1px solid var(--line); border-radius: 2px; color: var(--muted);
+}
+.tag.smoke { color: var(--accent); border-color: var(--accent-deep); }
+.tag.regression { color: var(--info); border-color: rgba(93, 182, 255, 0.3); }
+
+.steps { margin: 10px 0 8px; padding-left: 20px; color: var(--soft); font-size: 12.5px; line-height: 1.8; }
+.uses { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-top: 6px; }
+.uses .lbl { flex: 0 0 auto; }
+.chip {
+  font-family: var(--font-mono); font-size: 10.5px; padding: 2px 7px;
+  background: rgba(120, 220, 205, 0.06); border-radius: 2px; color: var(--soft);
+}
