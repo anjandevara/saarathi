@@ -91,6 +91,49 @@ now guards it, and the test or check that locks it.
   file and line number, then both files were fixed and the check was
   run again to confirm zero remain.
 
+## A full-viewport fixed canvas takes clicks unless you tell it not to
+
+- **What broke:** Saarathi's 3D core is a `<canvas id="gl">` at
+  `position: fixed; inset: 0`, covering the whole viewport. It kept the
+  default `pointer-events: auto`. Above the app's 1100px breakpoint the
+  top bar and panels are themselves positioned and paint above it, so
+  nothing showed. Below the breakpoint they become `static`, the canvas
+  painted over them, and it swallowed every click on the navigation.
+- **Why it mattered:** the app had no working navigation at all on a
+  phone, and had not for as long as the narrow breakpoint existed. The
+  element causing it is decorative and `aria-hidden`, so nothing about
+  the bug was visible: the links looked normal and simply did nothing.
+- **Guardrail:** `#gl` now sets `pointer-events: none`. It listens for
+  nothing but a window resize, so it never needed them. The general rule:
+  a decorative full-viewport layer must not take pointer events, and
+  `z-index` does not save you, because a static element cannot outrank a
+  positioned one.
+- **Test:** `tests/saarathi/saarathi.spec.ts`, the test titled "the
+  layout never scrolls sideways at a narrow width", which reaches the
+  rail and clicks through it at 390px. Proven to fail: removing
+  `pointer-events: none` turns it red, restoring it turns it green.
+
+## A text locator dies the moment the same words appear twice
+
+- **What broke:** the on-self suite found Saarathi's suite health label by
+  its text, "Suite health". Once the project had an actual run, the
+  activity ticker also rendered "Suite health N percent, ...", the text
+  matched two elements, and `findElement` refused to guess between them.
+- **Why it mattered:** the suite was green only while the project had
+  never been run. Running the tests once produced the JUnit file that
+  broke the tests. A tool that watches running projects must not fail
+  because a project ran, and the failure looked like a missing element
+  rather than an ambiguous one.
+- **Guardrail:** the element is now named, `data-testid="suite-health"`,
+  and the page object asks for that first with the text strategy left as
+  a fallback. This is what `findElement`'s own circuit-breaker message
+  tells you to do, and the resolver refusing to guess between two matches
+  is what turned a silent wrong-element click into a loud failure.
+- **Test:** `tests/saarathi/saarathi.spec.ts`, the test titled "loads the
+  command screen with the live suite health". It was watched failing on
+  the ambiguous locator, then passing once the element was named, with a
+  real run present in both cases.
+
 ## Honest limits (not turned into a test, and why)
 
 Not every fix in this project's history could reasonably become an

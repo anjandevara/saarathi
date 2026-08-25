@@ -94,8 +94,15 @@ test.describe('Saarathi command center: on-self checks', () => {
       await saarathi.goToSignals();
     });
 
-    await test.step('Then the four captured lessons are shown', async () => {
-      const lessonsHeading = await saarathi.getByVisibleText('Lessons (4)', 'Lessons section heading');
+    await test.step('Then the captured lessons are shown with a real count', async () => {
+      // The count is read as a number rather than pinned to one, because
+      // capturing a lesson is normal work, not a regression. What matters is
+      // that the section reports a real count and that a real lesson from
+      // LESSONS.md is listed under it, which the next assertion proves.
+      const lessonsHeading = await saarathi.getByVisibleText(
+        /Lessons \(\d+\)/,
+        'Lessons section heading with its count'
+      );
       const realLesson = await saarathi.getByVisibleText(
         'findElement() checked once instead of really waiting',
         'A real captured lesson from LESSONS.md'

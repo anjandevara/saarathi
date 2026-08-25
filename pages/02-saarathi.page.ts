@@ -64,7 +64,9 @@ export class SaarathiPage {
 
   // Finds any visible element carrying the given text, used to confirm a
   // specific agent, persona, lesson, or empty-state message is on screen.
-  getByVisibleText(text: string, description: string): Promise<Locator> {
+  // Accepts a RegExp as well as a string, the same as FindOptions.text does,
+  // so a caller can match "Lessons (6)" without pinning the number.
+  getByVisibleText(text: string | RegExp, description: string): Promise<Locator> {
     return findElement(this.page, { text, description }, this.logger);
   }
 
