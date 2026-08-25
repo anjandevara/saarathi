@@ -73,6 +73,19 @@ test("skips entries with no path and duplicate ids, keeping the rest", async () 
   assert.equal(all[0].path, "/abs/one", "the first entry wins a duplicate id");
 });
 
+test("the committed example file parses, and pins this repo to the id its runs are stored under", async () => {
+  // Reads the real example file, so this fails if someone edits it into
+  // something that does not load, or drops the explicit id. Defaulting the id
+  // from the folder name would give "playwright-ai-framework", a different key
+  // from the "playwright-framework" the recorded runs already use.
+  const example = await fs.readFile(path.join(HOME, "saarathi.projects.example.json"), "utf8");
+  await inTempDir(example);
+  const all = getProjectConfigs();
+  assert.equal(all.length, 2, "both example entries load, so the _comment keys are ignored");
+  assert.equal(all[0].id, "playwright-framework", "the example pins this repo's id to its run history");
+  assert.equal(all[1].id, "another-project", "the second entry still derives its id from the folder");
+});
+
 test("an unknown project id falls back to the first project, never undefined", async () => {
   await inTempDir(JSON.stringify([{ id: "a", path: "/abs/a" }, { id: "b", path: "/abs/b" }]));
   assert.equal(getProjectConfig("b").id, "b", "a configured id is honoured");

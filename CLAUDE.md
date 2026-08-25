@@ -78,6 +78,11 @@ absolute paths for one machine. If it is missing or malformed, Saarathi logs
 the reason and falls back to the single `SAARATHI_PROJECT_PATH` project, so
 the one-project case stays one line.
 
+The `id` is the key the run history is stored under. For this repo, set it to
+`playwright-framework`, which is what the single-project fallback uses. Let it
+default from the folder name and you get `playwright-ai-framework` instead, a
+different key, so the runs already recorded stop showing until the id matches.
+
 Framework, testing Saarathi on itself:
 
     TEST_ENV=saarathi npx playwright test tests/saarathi --config=playwright.saarathi.config.ts
