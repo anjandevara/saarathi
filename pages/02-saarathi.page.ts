@@ -52,7 +52,14 @@ export class SaarathiPage {
   }
 
   getSuiteHealthLabel(): Promise<Locator> {
-    return findElement(this.page, { text: 'Suite health', description: 'Suite health label under the core' }, this.logger);
+    // The words "Suite health" also appear in the activity ticker once a run
+    // exists, so text alone matches two elements and findElement rightly
+    // refuses to guess. The test id names the one under the core.
+    return findElement(
+      this.page,
+      { testId: 'suite-health', text: 'Suite health', description: 'Suite health label under the core' },
+      this.logger
+    );
   }
 
   // Finds any visible element carrying the given text, used to confirm a
@@ -65,5 +72,54 @@ export class SaarathiPage {
   // guard for bug 10 (Recommendations count was missing from the home summary).
   getRecsTile(): Promise<Locator> {
     return findElement(this.page, { text: 'Recs', description: 'Recommendations count tile in the home dock' }, this.logger);
+  }
+
+  // The per-project rail, found as an accessibility landmark rather than by a
+  // css class, so the guard survives any restyling and fails only if the rail
+  // stops being a labelled navigation region.
+  getRail(): Promise<Locator> {
+    return findElement(
+      this.page,
+      { role: 'navigation', name: 'Project sections', description: 'Per-project section rail' },
+      this.logger
+    );
+  }
+
+  // Every section link in the rail. Scoped inside the rail so a link of the
+  // same name anywhere else on the page cannot be mistaken for one of these.
+  async getRailSections(): Promise<Locator> {
+    return (await this.getRail()).getByRole('link');
+  }
+
+  // Whatever the rail marks as the open section. Matches nothing when no
+  // section is open, which is the case on a global view like Reports.
+  async getActiveRailSection(): Promise<Locator> {
+    return (await this.getRail()).locator('[aria-current="page"]');
+  }
+
+  async goToRailSection(name: string): Promise<void> {
+    const link = await findElement(
+      this.page,
+      { role: 'link', name, description: `${name} section link in the rail` },
+      this.logger
+    );
+    await link.click();
+  }
+
+  async goToReports(): Promise<void> {
+    const link = await findElement(
+      this.page,
+      { role: 'link', name: 'Reports', description: 'Reports link in the top bar' },
+      this.logger
+    );
+    await link.click();
+  }
+
+  // True when the document is wider than its viewport, which is the symptom a
+  // reader feels as the page sliding sideways.
+  async scrollsSideways(): Promise<boolean> {
+    return this.page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    );
   }
 }

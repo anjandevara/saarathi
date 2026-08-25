@@ -5,9 +5,10 @@ import { scanProject } from "./scan";
 import { ensureProject, recordRunIfNew, getRunHistory, dbAvailable } from "./db";
 import { buildPending, buildReport } from "./report";
 import { scanSpecs } from "./specs";
+import { buildDataAndFixtures, scanDataFolders } from "./fixtures";
 import snapshot from "../data/snapshot.json";
 import type { Report, ProjectLine, ReportView } from "./report";
-import type { Overview, ProjectMeta, SpecFile } from "./types";
+import type { DataAndFixtures, Overview, ProjectMeta, SpecFile } from "./types";
 
 // High-level data API used by the pages. Prefers live data scanned from the
 // configured Playwright project; falls back to a bundled snapshot so the app
@@ -60,6 +61,18 @@ export async function getSpecs(id?: string): Promise<SpecFile[]> {
   const cfg = getProjectConfig(id);
   if (!cfg.path || !existsSync(cfg.path)) return [];
   return scanSpecs(cfg.path);
+}
+
+/**
+ * The project's data folders and fixture modules, with usage inverted from the
+ * specs. Returns null when the project's folder is not on this machine, so the
+ * page can say that rather than render an empty view that reads as "no data".
+ */
+export async function getDataAndFixtures(id?: string): Promise<DataAndFixtures | null> {
+  const cfg = getProjectConfig(id);
+  if (!cfg.path || !existsSync(cfg.path)) return null;
+  const [specs, folders] = await Promise.all([scanSpecs(cfg.path), scanDataFolders(cfg.path)]);
+  return buildDataAndFixtures(specs, folders);
 }
 
 export function isDbLive(): boolean {

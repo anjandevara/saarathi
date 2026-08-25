@@ -144,7 +144,7 @@ test("scans the real tests folder of this repo and matches what is actually in i
   const demo = specs.find((s) => s.file.includes("demo.spec.ts"))!;
   const saarathi = specs.find((s) => s.file.includes("saarathi.spec.ts"))!;
   assert.equal(demo.tests.length, 8, "the demo spec has eight tests");
-  assert.equal(saarathi.tests.length, 4, "the saarathi spec has four tests");
+  assert.equal(saarathi.tests.length, 7, "the saarathi spec has seven tests");
   assert.equal(demo.suite, "Demo page: component actions");
   assert.equal(saarathi.suite, "Saarathi command center: on-self checks");
 
