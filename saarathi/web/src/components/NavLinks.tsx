@@ -18,6 +18,12 @@ export default function NavLinks() {
           </Link>
         );
       })}
+      {/* Settings is signposted but not built. Deliberately not a link, because
+          a link to a page that does not exist is a lie the reader only finds by
+          clicking it. Phase 5 builds the real screens. */}
+      <span className="nav-soon" aria-disabled="true" title="Settings arrives in Phase 5">
+        Settings
+      </span>
     </nav>
   );
 }
